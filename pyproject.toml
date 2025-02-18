@@ -1,12 +1,12 @@
-[project]
+[tool.poetry]
 name = "patterns-final"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "free uni(powerrangers)"}
+    "free uni(powerrangers)"
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 coverage = "^7.6.1"
