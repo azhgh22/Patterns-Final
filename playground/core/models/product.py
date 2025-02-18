@@ -6,7 +6,6 @@ from pydantic import BaseModel
 @dataclass
 class Product:
     id: str
-    unit_id: str
     name: str
     barcode: str
     price: int
@@ -14,7 +13,6 @@ class Product:
 
 @dataclass
 class ProductRequest(BaseModel):
-    unit_id: str
     name: str
     barcode: str
     price: int
@@ -23,7 +21,6 @@ class ProductRequest(BaseModel):
 @dataclass
 class ProductResponse(BaseModel):
     id: str
-    unit_id: str
     name: str
     barcode: str
     price: int
