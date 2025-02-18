@@ -5,10 +5,10 @@ from playground.core.models.receipt import (
     ReceiptRequest,
     AddProductRequest,
 )
-from playground.core.services.interfaces.campaign_service_interface import (
+from playground.core.services.interfaces.service_interfaces.campaign_service_interface import (
     ICampaignService,
 )
-from playground.core.services.interfaces.product_service_interface import (
+from playground.core.services.interfaces.service_interfaces.product_service_interface import (
     IProductService,
 )
 
