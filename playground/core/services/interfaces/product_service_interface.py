@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from playground.core.models.product import ProductRequest, ProductResponse
+from playground.core.models.product import ProductRequest, ProductResponse, Product
 
 
 class IProductService(Protocol):
@@ -11,4 +11,7 @@ class IProductService(Protocol):
         pass
 
     def update(self) -> ProductResponse:
+        pass
+
+    def get_product(self, p_id: str) -> Product:
         pass
