@@ -8,7 +8,7 @@ class Product:
     barcode: str
     price: int
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if other is None or not isinstance(other, type(self)):
             return False
         return (

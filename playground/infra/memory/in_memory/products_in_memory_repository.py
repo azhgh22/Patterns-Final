@@ -5,7 +5,7 @@ from playground.core.models.product import Product
 
 
 class ProductInMemoryRepository:
-    def __init__(self, product_list: List[Product] = None) -> None:
+    def __init__(self, product_list: List[Product] | None = None) -> None:
         if product_list is None:
             product_list = []
         self.product_list = product_list

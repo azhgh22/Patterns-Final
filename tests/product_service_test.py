@@ -14,12 +14,10 @@ def test_should_not_find_product() -> None:
 
 
 def test_should_get_stored_product() -> None:
-    service = ProductService(ProductInMemoryRepository([Product("1", "1", "1", 1)]))
+    l = [Product("1", "1", "1", 1)]
+    service = ProductService(ProductInMemoryRepository(l))
     prod = service.get_product("1")
-    assert prod.id == "1"
-    assert prod.name == "1"
-    assert prod.price == 1
-    assert prod.barcode == "1"
+    assert l[0] == prod
 
 
 def test_should_get_empty_list() -> None:
@@ -55,7 +53,7 @@ def test_should_not_create_product_with_negative_price() -> None:
 
 
 def test_should_store_product() -> None:
-    product_list = []
+    product_list: list[Product] = []
     service = ProductService(ProductInMemoryRepository(product_list))
     product = service.create(ProductRequest("1", "1", 3))
     assert product is not None
