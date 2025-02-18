@@ -1,0 +1,2 @@
+class ICampaignService:
+    pass
