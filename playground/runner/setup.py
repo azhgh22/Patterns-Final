@@ -15,7 +15,7 @@ class MemoryType(enum.Enum):
 class SetupConfiguration:
     memory_type: MemoryType
 
-def set_up_rotes(api: FastAPI) -> None:
+def set_up_routes(api: FastAPI) -> None:
     api.include_router(products_api, prefix="/products", tags=["Products"])
 
 
@@ -23,5 +23,5 @@ def setup(setup_conf: SetupConfiguration) -> FastAPI:
     api = FastAPI()
 
 
-    set_up_rotes(api)
+    set_up_routes(api)
     return api
