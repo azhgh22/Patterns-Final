@@ -30,8 +30,10 @@ class ProductService:
 
     def update(self, p_id: str, price: int) -> bool:
         if price < 0:
-            return False
-        return self.repo.update_price(p_id, price)
+            raise ValueError
+        if not self.repo.update_price(p_id, price):
+            raise IndexError
+        return True
 
     def get_product(self, p_id: str) -> Product | None:
         return self.repo.get_product_with_id(p_id)
