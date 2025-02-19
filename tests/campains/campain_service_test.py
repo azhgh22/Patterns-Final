@@ -1,0 +1,37 @@
+from playground.core.models.campaign import Campaign, CampaignRequestWithType
+from playground.core.services.classes.campaign_service import CampaignService
+from playground.infra.memory.in_memory.campaign_in_memory_repository import CampaignInMemoryRepository
+
+
+def test_env_works() -> None:
+    pass
+
+def test_campaign_not_exists() -> None:
+    try:
+        CampaignService().get_by_id("1")
+    except ValueError:
+        assert True
+
+def test_should_return_campaign() -> None:
+    cl = [Campaign(id="1", description=CampaignRequestWithType(type="1", params={}))]
+    service = CampaignService(CampaignInMemoryRepository(cl))
+    assert service.get_by_id("1") is not None
+    assert service.get_by_id("1").id == "1"
+    assert service.get_by_id("1").description is not None
+
+def test_should_add_campaign() -> None:
+    service = CampaignService(CampaignInMemoryRepository())
+    res = service.create(CampaignRequestWithType(type="1", params={}))
+    assert res is not None
+    assert res.id is not None
+    assert res.description.type == "1"
+
+def test_get_all() -> None:
+    cl = [Campaign(id="1", description=CampaignRequestWithType(type="1", params={}))]
+    service = CampaignService(CampaignInMemoryRepository(cl))
+    res = service.get_all()
+    assert res is not None
+    assert len(res) == 1
+
+
+# todo: test apply ofter receipt is finished
