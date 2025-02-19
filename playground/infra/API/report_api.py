@@ -9,10 +9,12 @@ x_reports_api = APIRouter()
 
 
 @sales_api.get("")
-async def get_sales_summary()-> List[ReceiptResponse]:
+async def get_sales_summary() -> List[ReceiptResponse]:
     pass
+
 
 @x_reports_api.get("")
-async def get_receipts_by_shift_id(shift_id: Optional[int] = Query(None)) -> List[ReceiptResponse]:
+async def get_receipts_by_shift_id(
+    shift_id: Optional[int] = Query(None),
+) -> List[ReceiptResponse]:
     pass
-
