@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from pydantic import BaseModel
-
 
 @dataclass
 class Product:
@@ -10,17 +8,37 @@ class Product:
     barcode: str
     price: int
 
+    def __eq__(self, other: object) -> bool:
+        if other is None or not isinstance(other, type(self)):
+            return False
+        return (
+            self.id == other.id
+            and self.name == other.name
+            and self.barcode == other.barcode
+            and self.price == other.price
+        )
+
 
 @dataclass
-class ProductRequest(BaseModel):
+class ProductRequest:
     name: str
     barcode: str
     price: int
 
 
-@dataclass
-class ProductResponse(BaseModel):
-    id: str
-    name: str
-    barcode: str
-    price: int
+# @dataclass
+# class ProductResponse:
+#     id: str
+#     name: str
+#     barcode: str
+#     price: int
+#
+#     def __eq__(self, other) -> bool:
+#         if other is None or not isinstance(other, type(self)):
+#             return False
+#         return (
+#             self.id == other.id
+#             and self.name == other.name
+#             and self.barcode == other.barcode
+#             and self.price == other.price
+#         )

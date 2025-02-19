@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from playground.core.models.product import ProductResponse, Product
+from playground.core.models.product import Product
 
 
 @dataclass
@@ -22,7 +22,7 @@ class ReceiptRequest(BaseModel):
 class ReceiptResponse(BaseModel):
     id: str
     status: str
-    products: List[ProductResponse]
+    products: List[Product]
     total: int
 
 
