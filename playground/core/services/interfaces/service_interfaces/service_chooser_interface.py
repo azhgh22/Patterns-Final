@@ -1,4 +1,4 @@
-from mypy.semanal_shared import Protocol
+from typing import Protocol
 
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
