@@ -35,9 +35,18 @@ class ProductRequestModel(BaseModel):
 @products_api.post("/", status_code=201)
 def create_product(request: Request, product: ProductRequestModel) -> Product:
     p_request = ProductRequest(product.name, product.barcode, product.price)
-    new_product = get_product_service(request).create(p_request)
-    if new_product is None:
-        raise HTTPException(status_code=300)
+    try:
+        new_product = get_product_service(request).create(p_request)
+    except IndexError:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Product with barcode {product.barcode} already exists",
+        )
+    except ValueError:
+        raise HTTPException(
+            status_code=422,
+            detail=f"price can not be negative",
+        )
     return new_product
 
 
@@ -52,7 +61,9 @@ class UpdateModel(BaseModel):
 
 
 @products_api.patch("/{product_id}")
-def update_product(request: Request, product_id: str, data: UpdateModel) -> Product:
+def update_product(
+    request: Request, product_id: str, data: UpdateModel
+) -> Product | None:
     service = get_product_service(request)
     try:
         service.update(product_id, data.price)

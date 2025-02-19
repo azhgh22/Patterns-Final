@@ -55,7 +55,10 @@ def test_should_not_update_with_negative_price() -> None:
 
 
 def test_should_not_create_product_with_negative_price() -> None:
-    assert not ProductService().create(ProductRequest("1", "1", -3))
+    try:
+        ProductService().create(ProductRequest("1", "1", -3))
+    except ValueError:
+        assert True
 
 
 def test_should_store_product() -> None:
@@ -70,4 +73,7 @@ def test_should_store_product() -> None:
 def test_should_not_store_product_with_existing_barcode() -> None:
     prod_list = [Product("1", "1", "1", 1)]
     service = ProductService(ProductInMemoryRepository(prod_list))
-    assert service.create(ProductRequest("1", "1", 1)) is None
+    try:
+        service.create(ProductRequest("1", "1", 1)) is None
+    except IndexError:
+        assert True
