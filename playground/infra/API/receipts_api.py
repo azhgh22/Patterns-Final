@@ -1,16 +1,16 @@
 from fastapi import APIRouter
 from starlette import status
 
-from playground.core.models.receipt import Receipt
+from playground.core.models.receipt import Receipt, ReceiptRequest, ReceiptResponse, AddProductRequest
 
 receipts_api = APIRouter()
 
 @receipts_api.post("" , status_code=status.HTTP_201_CREATED)
-def create_receipt():
+def create_receipt(receipt: ReceiptRequest) -> ReceiptResponse:
     pass
 
 @receipts_api.post("/{receipt_id}/products" , status_code=status.HTTP_200_OK)
-def add_product_to_receipt():
+def add_product_to_receipt(request: AddProductRequest):
     pass
 
 @receipts_api.post("/{receipt_id}/quotes" ,status_code=status.HTTP_200_OK)
