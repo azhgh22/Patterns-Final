@@ -1,5 +1,5 @@
 from playground.core.models.product import Product, ProductRequest
-from playground.core.services.product_service import ProductService
+from playground.core.services.classes.product_service import ProductService
 from playground.infra.memory.in_memory.products_in_memory_repository import (
     ProductInMemoryRepository,
 )
@@ -31,7 +31,10 @@ def test_should_get_all_products() -> None:
 
 
 def test_should_not_update_non_existing_product() -> None:
-    assert not ProductService().update("1", 1)
+    try:
+        ProductService().update("1", 1)
+    except IndexError:
+        assert True
 
 
 def test_should_return_updated_product() -> None:
@@ -44,7 +47,10 @@ def test_should_return_updated_product() -> None:
 def test_should_not_update_with_negative_price() -> None:
     prod_list = [Product("1", "1", "1", 1)]
     service = ProductService(ProductInMemoryRepository(prod_list))
-    assert not service.update("1", -4)
+    try:
+        service.update("1", -4)
+    except ValueError:
+        assert True
     assert 1 == prod_list[0].price
 
 

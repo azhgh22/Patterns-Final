@@ -1,20 +1,26 @@
-import enum
 from dataclasses import dataclass
 
 from fastapi import FastAPI
 
+from playground.core.services.classes.repository_in_memory_chooser import (
+    InMemoryChooser,
+)
+from playground.core.services.classes.service_chooser import ServiceChooser
+from playground.core.services.interfaces.service_interfaces.repository_chooser_interface import (
+    IRepositoryChooser,
+)
+from playground.core.services.interfaces.service_interfaces.service_chooser_interface import (
+    IServiceChooser,
+)
 from playground.infra.API.products_api import products_api
 from playground.infra.API.report_api import sales_api, x_reports_api
 
 
-class MemoryType(enum.Enum):
-    IN_MEMORY = 0
-    SQL_LITE = 1
-
-
 @dataclass
 class SetupConfiguration:
-    memory_type: MemoryType
+    service_chooser: IServiceChooser = ServiceChooser()
+    repository_chooser: IRepositoryChooser = InMemoryChooser()
+
 
 def set_up_routes(api: FastAPI) -> None:
     api.include_router(products_api, prefix="/products", tags=["Products"])
@@ -24,7 +30,7 @@ def set_up_routes(api: FastAPI) -> None:
 
 def setup(setup_conf: SetupConfiguration) -> FastAPI:
     api = FastAPI()
-
-
+    api.state.repo = setup_conf.repository_chooser
+    api.state.core = setup_conf.service_chooser
     set_up_routes(api)
     return api
