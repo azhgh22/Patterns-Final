@@ -1,5 +1,5 @@
 from playground.core.models.product import Product, ProductRequest
-from playground.core.services.product_service import ProductService
+from playground.core.services.classes.product_service import ProductService
 from playground.infra.memory.in_memory.products_in_memory_repository import (
     ProductInMemoryRepository,
 )
