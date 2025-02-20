@@ -20,24 +20,23 @@ class CampaignInterface(ABC):
 
 
 class BuyNGetNCampaign(CampaignInterface):
-    def __init__(self, required_quantity: int, free_quantity: int, product_id: int) -> None:
+    def __init__(self, required_quantity: int = 1, product_id: str = "1") -> None:
         self.required_quantity = required_quantity
-        self.free_quantity = free_quantity
         self.product_id = product_id
 
     def apply(self, receipt: Receipt) -> Receipt:
         for item in receipt.products:
             if item.id == self.product_id and item.quantity >= self.required_quantity:
-                item.quantity += self.free_quantity
+                item.quantity += self.required_quantity
         return receipt
 
     @staticmethod
-    def create(required_quantity: int, free_quantity: int, product_id: int) -> BuyNGetNCampaign:
-        return BuyNGetNCampaign(required_quantity, free_quantity, product_id)
+    def create(required_quantity: int = 1, product_id: str = "1") -> BuyNGetNCampaign:
+        return BuyNGetNCampaign(required_quantity, product_id)
 
 
 class DiscountCampaign(CampaignInterface):
-    def __init__(self, product_id: int, discount_percentage: float) -> None:
+    def __init__(self, discount_percentage: float = 50, product_id: str="1") -> None:
         self.product_id = product_id
         self.discount_percentage = discount_percentage
 
@@ -48,12 +47,14 @@ class DiscountCampaign(CampaignInterface):
         return receipt
 
     @staticmethod
-    def create(product_id: int, discount_percentage: float) -> DiscountCampaign:
-        return DiscountCampaign(product_id, discount_percentage)
+    def create(discount_percentage: float =50, product_id: str="1") -> DiscountCampaign:
+        return DiscountCampaign(discount_percentage, product_id)
 
 
 class ComboCampaign(CampaignInterface):
-    def __init__(self, product_ids: List[int], discount_percentage: float) -> None:
+    def __init__(self, product_ids=None, discount_percentage: float = 50) -> None:
+        if product_ids is None:
+            product_ids = []
         self.product_ids = product_ids
         self.discount_percentage = discount_percentage
 
@@ -65,6 +66,8 @@ class ComboCampaign(CampaignInterface):
         return receipt
 
     @staticmethod
-    def create(product_ids: List[int], discount_percentage: float) -> ComboCampaign:
+    def create(product_ids=None, discount_percentage: float = 50) -> ComboCampaign:
+        if product_ids is None:
+            product_ids = []
         return ComboCampaign(product_ids, discount_percentage)
 

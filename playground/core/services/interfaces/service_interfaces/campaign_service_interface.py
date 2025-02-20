@@ -20,5 +20,5 @@ class ICampaignService(Protocol):
     def get_campaign_request_with_type_instance(self, campaign_type: str, **kwargs) -> CampaignRequestWithType:
         pass
 
-    def delete(self, campaign_id: str) -> Campaign:
+    def delete(self, campaign_id: str) -> None:
         pass

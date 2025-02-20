@@ -32,5 +32,5 @@ class CampaignService:
     def get_campaign_request_with_type_instance(self, campaign_type: str, **kwargs) -> CampaignRequestWithType:
         return self.factory.create_campaign(campaign_type=campaign_type, **kwargs).to_request()
 
-    def delete(self, campaign_id: str) -> Campaign:
+    def delete(self, campaign_id: str) -> None:
         self.repo.delete_campaign(campaign_id)
