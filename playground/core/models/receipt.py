@@ -7,12 +7,6 @@ from playground.core.models.product import Product
 
 
 @dataclass
-class ProductInReceipt:
-    product: Product
-    amount: int
-
-
-@dataclass
 class Receipt:
     id: str
     status: str
