@@ -13,7 +13,8 @@ class ReceiptService:
     receiptRepo: ReceiptRepository = ReceiptInMemoryRepository()
 
     def create(self, prod_req: ReceiptRequest) -> ReceiptResponse:
-        if prod_req.status is not "open":
+        if prod_req.status != "open":
+            print(prod_req.status)
             raise ValueError(f"Receipt status should be open.")
         receipt_id = str(uuid4())
         new_receipt = Receipt(receipt_id , "open" , [])
