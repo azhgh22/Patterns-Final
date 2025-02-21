@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import List
 
 
-@dataclass
 class ReceiptItem:
     product_id: str
     quantity: int
@@ -10,7 +9,6 @@ class ReceiptItem:
     total: int
 
 
-@dataclass
 class Receipt:
     id: str
     status: str
