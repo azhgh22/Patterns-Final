@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from playground.core.models.product import Product
-from playground.core.models.receipt import Receipt, ReceiptResponse, ReceiptRequest, AddProductRequest
+from playground.core.models.receipt import Receipt
 
 
 class ReceiptRepository(Protocol):

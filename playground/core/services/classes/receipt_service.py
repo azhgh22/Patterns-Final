@@ -14,7 +14,7 @@ class ReceiptService:
 
     def create(self, prod_req: ReceiptRequest) -> ReceiptResponse:
         if prod_req.status is not "open":
-            raise ValueError
+            raise ValueError(f"Receipt status should be open.")
         receipt_id = str(uuid4())
         new_receipt = Receipt(receipt_id , "open" , [])
         self.receiptRepo.store_receipt(new_receipt)
@@ -25,13 +25,13 @@ class ReceiptService:
 
     def delete(self, receipt_id: str) -> None:
         if not self.receiptRepo.contains_receipt(receipt_id):
-            raise ValueError
+            raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         self.receiptRepo.delete_receipt(receipt_id)
 
     def get(self, receipt_id: str) -> ReceiptResponse:
         receipt = self.receiptRepo.get_receipt(receipt_id)
         if receipt is None:
-            raise ValueError
+            raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         return ReceiptResponse(receipt.id , receipt.status , receipt.products , receipt.calculate_total())
 
     def add_product(
@@ -41,7 +41,11 @@ class ReceiptService:
             product_service: IProductService,
     ) -> ReceiptResponse:
         product = product_service.get_product(product_request.id)
-        if product is None or not self.receiptRepo.contains_receipt(receipt_id) or self.receiptRepo.get_receipt(receipt_id).status is not "open":
-            raise ValueError
+        if product is None:
+            raise ValueError(f"Product with id {product_request.id} does not exist.")
+        if not self.receiptRepo.contains_receipt(receipt_id):
+            raise ValueError(f"Receipt with id {receipt_id} does not exist.")
+        if self.receiptRepo.get_receipt(receipt_id).status is not "open":
+            raise ValueError(f"Receipt status should be open.")
         new_receipt = self.receiptRepo.add_product_to_receipt(receipt_id, product , product_request.quantity)
         return ReceiptResponse(new_receipt.id , "open" , new_receipt.products , new_receipt.calculate_total())
