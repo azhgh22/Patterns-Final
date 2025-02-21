@@ -1,9 +1,9 @@
 from typing import Protocol
 
 from playground.core.models.receipt import (
-    ReceiptResponse,
-    ReceiptRequest,
     AddProductRequest,
+    ReceiptRequest,
+    ReceiptResponse,
 )
 from playground.core.services.interfaces.service_interfaces.campaign_service_interface import (
     ICampaignService,

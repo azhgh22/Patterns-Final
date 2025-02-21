@@ -1,10 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-from pydantic import BaseModel
-
-from playground.core.models.product import Product
-
 
 @dataclass
 class ReceiptItem:
@@ -27,7 +23,6 @@ class Receipt:
 
     def calculate_total(self) -> int:
         return sum(product.total for product in self.products)
-
 
 
 @dataclass

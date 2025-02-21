@@ -12,8 +12,8 @@ from playground.core.services.interfaces.service_interfaces.repository_chooser_i
 from playground.core.services.interfaces.service_interfaces.service_chooser_interface import (
     IServiceChooser,
 )
-from playground.infra.API.receipts_api import receipts_api
 from playground.infra.API.products_api import products_api
+from playground.infra.API.receipts_api import receipts_api
 from playground.infra.API.report_api import sales_api, x_reports_api
 
 

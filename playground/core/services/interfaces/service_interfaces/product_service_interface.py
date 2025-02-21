@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from playground.core.models.product import ProductRequest, Product
+from playground.core.models.product import Product, ProductRequest
 
 
 class IProductService(Protocol):
