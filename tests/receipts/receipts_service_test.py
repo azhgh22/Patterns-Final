@@ -1,9 +1,76 @@
-from playground.core.models.receipt import ReceiptRequest
+import pytest
+
+from playground.core.models.product import ProductRequest, Product
+from playground.core.models.receipt import ReceiptRequest, ReceiptResponse, Receipt, AddProductRequest
+from playground.core.services.classes.product_service import ProductService
 from playground.core.services.classes.receipt_service import ReceiptService
+from playground.infra.memory.in_memory.products_in_memory_repository import ProductInMemoryRepository
+from playground.infra.memory.in_memory.receipts_in_memory_repository import ReceiptInMemoryRepository
 
 
 def test_env_works() -> None:
     pass
 
 def test_should_not_create_receipt_wrong_status() -> None:
-    assert ReceiptService().create(ReceiptRequest("close")) is None
+    with pytest.raises(ValueError):
+        ReceiptService().create(ReceiptRequest("close"))
+
+def test_should_store_receipt() -> None:
+    new_receipt = ReceiptService().create(ReceiptRequest("open"))
+    assert isinstance(new_receipt, ReceiptResponse)
+    assert new_receipt is not None
+
+def test_should_not_delete_non_existing_receipt() -> None:
+    service = ReceiptService(ReceiptInMemoryRepository())
+
+    with pytest.raises(ValueError):
+        service.delete("11")
+
+def test_should_delete_existing_receipt() -> None:
+    service = ReceiptService(ReceiptInMemoryRepository([Receipt("11" , "open" , [])]))
+
+    assert not service.delete("11") # if there is no assertions its good
+
+def test_should_not_get_non_existing_receipt() -> None:
+    service = ReceiptService(ReceiptInMemoryRepository([]))
+
+    with pytest.raises(ValueError):
+        service.get("11")
+
+def test_should_get_existing_receipt() -> None:
+    service = ReceiptService(ReceiptInMemoryRepository([Receipt("11" , "open" , [])]))
+
+    response = service.get("11")
+    assert isinstance(response, ReceiptResponse)
+    assert response.id == "11"
+
+def test_should_not_add_non_existing_product_to_receipt() -> None:
+    product_service = ProductService()
+    product_request = AddProductRequest("1" , 1)
+    receipt = Receipt("11" , "open" , [])
+    receipt_service = ReceiptService(ReceiptInMemoryRepository([receipt]))
+    with pytest.raises(ValueError):
+        receipt_service.add_product("11" , product_request , product_service)
+
+def test_should_not_add_product_to_non_existing_receipt() -> None:
+    product_service = ProductService(ProductInMemoryRepository([Product("1" , "vashli" , "111" , 2)]))
+    product_request = AddProductRequest("1", 1)
+    receipt_service = ReceiptService(ReceiptInMemoryRepository())
+    with pytest.raises(ValueError):
+        receipt_service.add_product("11" , product_request , product_service)
+
+def test_should_add_product_to_receipt() -> None:
+    product_service = ProductService(ProductInMemoryRepository([Product("1", "vashli", "111", 2)]))
+    product_request = AddProductRequest("1", 1)
+    receipt_service = ReceiptService(ReceiptInMemoryRepository([Receipt("11" , "open" , [])]))
+    response = receipt_service.add_product("11" , product_request , product_service)
+    assert isinstance(response, ReceiptResponse)
+    assert response.id == "11"
+    assert len(response.products) == 1
+
+def test_should_not_add_product_to_not_opened_receipt() -> None:
+    product_service = ProductService(ProductInMemoryRepository([Product("1", "vashli", "111", 2)]))
+    product_request = AddProductRequest("1", 1)
+    receipt_service = ReceiptService(ReceiptInMemoryRepository([Receipt("11", "closed", [])]))
+    with pytest.raises(ValueError):
+        receipt_service.add_product("11", product_request, product_service)

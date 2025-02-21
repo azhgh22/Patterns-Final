@@ -1,6 +1,5 @@
+from dataclasses import dataclass
 from uuid import uuid4
-
-from pydantic.dataclasses import dataclass
 
 from playground.core.models.receipt import ReceiptRequest, ReceiptResponse, AddProductRequest, Receipt
 from playground.core.services.interfaces.memory.receipt_repository import ReceiptRepository
@@ -42,7 +41,7 @@ class ReceiptService:
             product_service: IProductService,
     ) -> ReceiptResponse:
         product = product_service.get_product(product_request.id)
-        if product is None or not self.receiptRepo.contains_receipt(receipt_id):
+        if product is None or not self.receiptRepo.contains_receipt(receipt_id) or self.receiptRepo.get_receipt(receipt_id).status is not "open":
             raise ValueError
         new_receipt = self.receiptRepo.add_product_to_receipt(receipt_id, product , product_request.quantity)
-        return ReceiptResponse(new_receipt.id , "open" , new_receipt.l , 0)
+        return ReceiptResponse(new_receipt.id , "open" , new_receipt.products , new_receipt.calculate_total())
