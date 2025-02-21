@@ -13,7 +13,7 @@ from playground.core.services.interfaces.service_interfaces.product_service_inte
 )
 
 
-class IReceptService(Protocol):
+class IReceiptService(Protocol):
     def create(self, prod_req: ReceiptRequest) -> ReceiptResponse:
         pass
 
