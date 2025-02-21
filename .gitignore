@@ -1,3 +1,6 @@
 .venv
 .idea
 app.log
+*.pyc
+*/__pycache__/*
+*.db

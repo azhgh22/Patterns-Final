@@ -14,11 +14,13 @@ from playground.infra.memory.in_memory.products_in_memory_repository import (
 class ProductService:
     repo: ProductRepository = ProductInMemoryRepository()
 
-    def create(self, prod_req: ProductRequest) -> Product | None:
-        if prod_req.price < 0 or self.repo.contains_product_with_barcode(
-            prod_req.barcode
-        ):
-            return None
+    def create(self, prod_req: ProductRequest) -> Product:
+        if prod_req.price < 0:
+            raise ValueError
+
+        if self.repo.contains_product_with_barcode(prod_req.barcode):
+            raise IndexError
+
         new_product = Product(
             str(uuid4()), prod_req.name, prod_req.barcode, prod_req.price
         )

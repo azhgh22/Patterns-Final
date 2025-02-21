@@ -74,7 +74,7 @@ def test_should_not_create_product_with_existing_barcode() -> None:
     product_list = [Product("1", "1", "1", 1)]
     http = get_http(ProductInMemoryRepository(product_list=product_list))
     response = http.post("/products", json={"name": "1", "barcode": "1", "price": 10})
-    assert response.status_code == 300
+    assert response.status_code == 409
     assert 1 == len(product_list)
 
 
@@ -82,5 +82,5 @@ def test_should_not_create_product_with_negative_price() -> None:
     product_list: list[Product] = []
     http = get_http(ProductInMemoryRepository(product_list=product_list))
     response = http.post("/products", json={"name": "1", "barcode": "1", "price": -10})
-    assert response.status_code == 300
+    assert response.status_code == 422
     assert 0 == len(product_list)
