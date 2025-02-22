@@ -13,12 +13,6 @@ class CampaignInMemoryRepository:
         # todo: implement equation check
         self.campaigns.append(campaign)
 
-    def apply_campaigns(self, receipt: Receipt) -> Receipt:
-        res = receipt
-        for campaign in self.campaigns:
-            res = campaign.get_campaign().apply(res)
-        return res
-
     def get_by_id(self, campaign_id) -> Campaign:
         for campaign in self.campaigns:
             if campaign.id == campaign_id:

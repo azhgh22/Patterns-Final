@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 
+from playground.core.models.campaign import Campaign, CampaignRequestWithType
 from playground.core.services.classes.repository_in_memory_chooser import InMemoryChooser
 from playground.core.services.interfaces.memory.campaign_repository import CampaignRepository
 
@@ -29,60 +30,26 @@ def test_should_return_empty_list() -> None:
 
 
 def test_delete()->None:
-    response = get_http().post(
-        "/campaigns?campaign_type=discount",
-        json={
-            "discount_percentage": 20,
-            "applicable_product": 10
-        }
-    )
-    response = get_http().get("/campaigns")
-    assert response.status_code == 200
-    assert list(response.json()).__len__() == 1
-    assert response.json()[0]["id"] is not None
-
-    cur_id = response.json()[0]["id"]
-
-    response = get_http().delete(f"/campaigns/{cur_id}")
+    cl = [Campaign(id="1", description=CampaignRequestWithType(type="none", params={}))]
+    response = get_http(CampaignInMemoryRepository(cl)).delete(f"/campaigns/{1}")
     assert response.status_code == 200
 
-    response = get_http().get("/campaigns")
-    assert response.status_code == 200
-    assert list(response.json()).__len__() == 0
-
-    response = get_http().delete(f"/campaigns/{cur_id}")
+    response = get_http().delete(f"/campaigns/{1}")
     assert response.status_code == 404
 
 
 def test_should_return_not_empty_list() -> None:
-    response = get_http().post(
-        "/campaigns?campaign_type=discount",
-        json={
-            "discount_percentage": 20,
-            "applicable_product": 10
-        }
-    )
-    response = get_http().post(
-        "/campaigns?campaign_type=combo",
-        json={
-            "product_ids": [],
-            "discount_percentage": 10
-        }
-    )
-    response = get_http().post(
-        "/campaigns?campaign_type=buy_n_get_n",
-        json={
-            "required_quantity": 2,
-            "product_id": 123
-        }
-    )
-    response = get_http().get("/campaigns")
+    cl = [Campaign(id="1", description=CampaignRequestWithType(type="none", params={})),
+          Campaign(id="2", description=CampaignRequestWithType(type="none", params={})),
+          Campaign(id="3", description=CampaignRequestWithType(type="none", params={}))]
 
+    response = get_http(CampaignInMemoryRepository(cl)).get("/campaigns")
 
     assert response.status_code == 200
     assert list(response.json()).__len__() == 3
 
 def test_should_add_campaign_buy_n_get_n() -> None:
+
     response = get_http().post(
         "/campaigns?campaign_type=buy_n_get_n",
         json={

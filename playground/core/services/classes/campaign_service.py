@@ -20,7 +20,10 @@ class CampaignService:
         return res
 
     def apply(self, receipt: Receipt) -> Receipt:
-        res = self.repo.apply_campaigns(receipt)
+        campaigns = self.get_all()
+        res = receipt
+        for campaign in campaigns:
+            res = campaign.get_campaign().apply(res)
         return res
 
     def get_by_id(self, campaign_id: str) -> Campaign:

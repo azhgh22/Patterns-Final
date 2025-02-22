@@ -9,9 +9,6 @@ class CampaignRepository(Protocol):
     def add_campaign(self, campaign: Campaign) -> None:
         pass
 
-    def apply_campaigns(self, receipt: Receipt) -> Receipt:
-        pass
-
     def get_by_id(self, campaign_id) -> Campaign:
         pass
 
