@@ -1,5 +1,6 @@
 from playground.core.services.classes.product_service import ProductService
 from playground.core.services.classes.receipt_service import ReceiptService
+from playground.core.services.interfaces.memory import ShiftRepository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
@@ -12,6 +13,9 @@ from playground.core.services.interfaces.service_interfaces.product_service_inte
 from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
     IReceiptService,
 )
+from playground.core.services.interfaces.service_interfaces.shift_service_interface import (
+    IShiftService,
+)
 
 
 class ServiceChooser:
@@ -20,3 +24,6 @@ class ServiceChooser:
 
     def get_receipt_service(self, receipt_repo: ReceiptRepository) -> IReceiptService:
         return ReceiptService(receipt_repo)
+
+    def get_shift_service(self, shift_repo: ShiftRepository) -> IShiftService:
+        pass
