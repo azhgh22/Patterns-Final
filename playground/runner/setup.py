@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Final
 
 from fastapi import FastAPI
 
@@ -24,6 +25,8 @@ from playground.infra.memory.in_memory.products_in_memory_repository import (
     ProductInMemoryRepository,
 )
 
+DB_NAME: Final = "shop.db"
+
 
 @dataclass
 class SetupConfiguration:
@@ -32,7 +35,7 @@ class SetupConfiguration:
 
     @classmethod
     def for_production(cls) -> "SetupConfiguration":
-        return cls(ServiceChooser(), SqlLiteChooser())
+        return cls(ServiceChooser(), SqlLiteChooser(DB_NAME))
 
     @classmethod
     def for_testing(
