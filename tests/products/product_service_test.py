@@ -14,10 +14,10 @@ def test_should_not_find_product() -> None:
 
 
 def test_should_get_stored_product() -> None:
-    l = [Product("1", "1", "1", 1)]
-    service = ProductService(ProductInMemoryRepository(l))
+    product_list = [Product("1", "1", "1", 1)]
+    service = ProductService(ProductInMemoryRepository(product_list))
     prod = service.get_product("1")
-    assert l[0] == prod
+    assert product_list[0] == prod
 
 
 def test_should_get_empty_list() -> None:

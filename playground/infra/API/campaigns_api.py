@@ -9,16 +9,14 @@ campaigns_api = APIRouter()
 async def get_campaign():
     pass
 
+
 @campaigns_api.post("")
 # todo: add return type
 async def create_campaign():
     pass
 
+
 @campaigns_api.delete("/{campaign_id}")
 # todo: add return type
 async def delete_campaign(campaign_id: str):
     pass
-
-
-
-

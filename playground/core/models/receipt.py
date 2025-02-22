@@ -1,32 +1,35 @@
 from dataclasses import dataclass
 from typing import List
 
-from pydantic import BaseModel
 
-from playground.core.models.product import Product
+@dataclass
+class ReceiptItem:
+    product_id: str
+    quantity: int
+    price: int
+    total: int
 
 
 @dataclass
 class Receipt:
     id: str
     status: str
-    products: List[Product]
-
-
-@dataclass
-class ReceiptRequest(BaseModel):
-    status: str
-
-
-@dataclass
-class ReceiptResponse(BaseModel):
-    id: str
-    status: str
-    products: List[Product]
+    products: List[ReceiptItem]
     total: int
+    discounted_total: int
+
+    def __eq__(self, other: object) -> bool:
+        if other is None or not isinstance(other, type(self)):
+            return False
+        return self.id == other.id
 
 
 @dataclass
-class AddProductRequest(BaseModel):
+class ReceiptRequest:
+    status: str
+
+
+@dataclass
+class AddProductRequest:
     id: str
     quantity: int
