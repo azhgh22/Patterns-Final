@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 
+@dataclass
 class ReceiptItem:
     product_id: str
     quantity: int
@@ -9,18 +10,18 @@ class ReceiptItem:
     total: int
 
 
+@dataclass
 class Receipt:
     id: str
     status: str
     products: List[ReceiptItem]
+    total: int
+    discounted_total: int | None
 
     def __eq__(self, other: object) -> bool:
         if other is None or not isinstance(other, type(self)):
             return False
         return self.id == other.id
-
-    def calculate_total(self) -> int:
-        return sum(product.total for product in self.products)
 
 
 @dataclass
@@ -34,6 +35,7 @@ class ReceiptResponse:
     status: str
     products: List[ReceiptItem]
     total: int
+    discounted_total: int | None
 
 
 @dataclass

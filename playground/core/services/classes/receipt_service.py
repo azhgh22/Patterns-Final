@@ -29,9 +29,9 @@ class ReceiptService:
         if prod_req.status != "open":
             raise ValueError("Receipt status should be open.")
         receipt_id = str(uuid4())
-        new_receipt = Receipt(receipt_id, "open", [])
+        new_receipt = Receipt(receipt_id, "open", [] , 0 , None)
         self.receiptRepo.store_receipt(new_receipt)
-        return ReceiptResponse(receipt_id, "open", [], 0)
+        return ReceiptResponse(receipt_id, "open", [], 0 , None)
 
     def close(self, campaign_service: ICampaignService) -> ReceiptResponse:
         pass
@@ -46,7 +46,7 @@ class ReceiptService:
         if receipt is None:
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         return ReceiptResponse(
-            receipt.id, receipt.status, receipt.products, receipt.calculate_total()
+            receipt.id, receipt.status, receipt.products, receipt.total , receipt.discounted_total
         )
 
     def add_product(
@@ -66,5 +66,5 @@ class ReceiptService:
             receipt_id, product, product_request.quantity
         )
         return ReceiptResponse(
-            new_receipt.id, "open", new_receipt.products, new_receipt.calculate_total()
+            new_receipt.id, "open", new_receipt.products, new_receipt.total , new_receipt.discounted_total
         )

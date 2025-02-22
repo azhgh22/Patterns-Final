@@ -45,4 +45,5 @@ class ReceiptInMemoryRepository:
         receipt.products.append(
             ReceiptItem(product.id, quantity, product.price, product.price * quantity)
         )
+        receipt.total += product.price * quantity
         return receipt
