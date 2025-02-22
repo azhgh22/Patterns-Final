@@ -17,8 +17,8 @@ from playground.infra.memory.sql_lite.shift_sql_lite_repository import ShiftSqlL
 
 
 class SqlLiteChooser:
-    def __init__(self) -> None:
-        connection = sqlite3.connect("shop.db", check_same_thread=False)
+    def __init__(self, db_name: str) -> None:
+        connection = sqlite3.connect(db_name, check_same_thread=False)
         self.product_repository = ProductSqlLiteRepository(connection)
         self.payment_repository = PaymentSqlLiteRepository(connection)
         self.receipt_repository = ReceiptSqlLiteRepository(connection)
