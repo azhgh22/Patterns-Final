@@ -10,7 +10,7 @@ from playground.core.services.interfaces.memory.product_repository import (
 from playground.infra.memory.in_memory.products_in_memory_repository import (
     ProductInMemoryRepository,
 )
-from playground.runner.setup import setup, SetupConfiguration
+from playground.runner.setup import SetupConfiguration, setup
 
 
 def get_http(

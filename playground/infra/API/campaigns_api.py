@@ -1,8 +1,5 @@
-from typing import List, Optional
 
-from fastapi import APIRouter, Query
-
-from playground.core.models.receipt import ReceiptResponse
+from fastapi import APIRouter
 
 campaigns_api = APIRouter()
 
