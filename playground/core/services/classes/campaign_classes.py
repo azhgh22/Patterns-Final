@@ -7,8 +7,8 @@ from abc import ABC, abstractmethod
 from typing import List
 from playground.core.models.receipt import ReceiptResponse
 
-class CampaignInterface(ABC):
 
+class CampaignInterface(ABC):
     @abstractmethod
     def apply(self, receipt: Receipt) -> Receipt:
         pass
@@ -36,18 +36,20 @@ class BuyNGetNCampaign(CampaignInterface):
 
 
 class DiscountCampaign(CampaignInterface):
-    def __init__(self, discount_percentage: float = 50, product_id: str="1") -> None:
+    def __init__(self, discount_percentage: float = 50, product_id: str = "1") -> None:
         self.product_id = product_id
         self.discount_percentage = discount_percentage
 
     def apply(self, receipt: Receipt) -> Receipt:
         for item in receipt.products:
             if item.id == self.product_id:
-                item.price *= (1 - self.discount_percentage / 100)
+                item.price *= 1 - self.discount_percentage / 100
         return receipt
 
     @staticmethod
-    def create(discount_percentage: float =50, product_id: str="1") -> DiscountCampaign:
+    def create(
+        discount_percentage: float = 50, product_id: str = "1"
+    ) -> DiscountCampaign:
         return DiscountCampaign(discount_percentage, product_id)
 
 
@@ -59,10 +61,12 @@ class ComboCampaign(CampaignInterface):
         self.discount_percentage = discount_percentage
 
     def apply(self, receipt: Receipt) -> Receipt:
-        if all(any(item.id == pid for item in receipt.products) for pid in self.product_ids):
+        if all(
+            any(item.id == pid for item in receipt.products) for pid in self.product_ids
+        ):
             for item in receipt.products:
                 if item.id in self.product_ids:
-                    item.price *= (1 - self.discount_percentage / 100)
+                    item.price *= 1 - self.discount_percentage / 100
         return receipt
 
     @staticmethod
@@ -70,4 +74,3 @@ class ComboCampaign(CampaignInterface):
         if product_ids is None:
             product_ids = []
         return ComboCampaign(product_ids, discount_percentage)
-

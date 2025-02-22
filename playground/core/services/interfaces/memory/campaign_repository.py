@@ -1,11 +1,10 @@
 from typing import Protocol, List
 
-from playground.core.models.campaign import  Campaign
+from playground.core.models.campaign import Campaign
 from playground.core.models.receipt import Receipt
 
 
 class CampaignRepository(Protocol):
-
     def add_campaign(self, campaign: Campaign) -> None:
         pass
 

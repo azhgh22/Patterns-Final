@@ -4,9 +4,16 @@ from uuid import uuid4
 
 from playground.core.models.campaign import Campaign, CampaignRequestWithType
 from playground.core.models.receipt import Receipt
-from playground.core.services.classes.campaign_factory import CampaignRequestFactory, CampaignFactory
-from playground.infra.memory.in_memory.campaign_in_memory_repository import CampaignInMemoryRepository
-from playground.core.services.interfaces.memory.campaign_repository import CampaignRepository
+from playground.core.services.classes.campaign_factory import (
+    CampaignRequestFactory,
+    CampaignFactory,
+)
+from playground.infra.memory.in_memory.campaign_in_memory_repository import (
+    CampaignInMemoryRepository,
+)
+from playground.core.services.interfaces.memory.campaign_repository import (
+    CampaignRepository,
+)
 
 
 @dataclass
@@ -32,8 +39,12 @@ class CampaignService:
     def get_all(self) -> List[Campaign]:
         return self.repo.get_all()
 
-    def get_campaign_request_with_type_instance(self, campaign_type: str, **kwargs) -> CampaignRequestWithType:
-        return self.factory.create_campaign(campaign_type=campaign_type, **kwargs).to_request()
+    def get_campaign_request_with_type_instance(
+        self, campaign_type: str, **kwargs
+    ) -> CampaignRequestWithType:
+        return self.factory.create_campaign(
+            campaign_type=campaign_type, **kwargs
+        ).to_request()
 
     def delete(self, campaign_id: str) -> None:
         self.repo.delete_campaign(campaign_id)

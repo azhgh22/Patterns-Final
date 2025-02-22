@@ -1,13 +1,14 @@
-from typing import  List
+from typing import List
 
-from playground.core.models.campaign import  Campaign
+from playground.core.models.campaign import Campaign
 from playground.core.models.receipt import Receipt
 
 
 class CampaignInMemoryRepository:
-
     def __init__(self, campaign_list: List[Campaign] | None = None) -> None:
-        self.campaigns: List[Campaign] = campaign_list if campaign_list is not None else []
+        self.campaigns: List[Campaign] = (
+            campaign_list if campaign_list is not None else []
+        )
 
     def add_campaign(self, campaign: Campaign) -> None:
         # todo: implement equation check

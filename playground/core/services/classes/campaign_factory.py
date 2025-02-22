@@ -1,7 +1,15 @@
-from playground.core.models.campaign import BuyNGetNCampaignRequest, DiscountCampaignRequest, CampaignRequestInterface, \
-    ComboCampaignRequest
-from playground.core.services.classes.campaign_classes import BuyNGetNCampaign, DiscountCampaign, ComboCampaign, \
-    CampaignInterface
+from playground.core.models.campaign import (
+    BuyNGetNCampaignRequest,
+    DiscountCampaignRequest,
+    CampaignRequestInterface,
+    ComboCampaignRequest,
+)
+from playground.core.services.classes.campaign_classes import (
+    BuyNGetNCampaign,
+    DiscountCampaign,
+    ComboCampaign,
+    CampaignInterface,
+)
 
 
 class CampaignFactory:
@@ -19,7 +27,6 @@ class CampaignFactory:
         return campaign_class.create(**kwargs)
 
 
-
 class CampaignRequestFactory:
     CAMPAIGN_REQUEST_TYPES = {
         "buy_n_get_n": BuyNGetNCampaignRequest,
@@ -29,9 +36,9 @@ class CampaignRequestFactory:
 
     @staticmethod
     def create_campaign(campaign_type: str, **kwargs) -> CampaignRequestInterface:
-        campaign_request_class = CampaignRequestFactory.CAMPAIGN_REQUEST_TYPES.get(campaign_type)
+        campaign_request_class = CampaignRequestFactory.CAMPAIGN_REQUEST_TYPES.get(
+            campaign_type
+        )
         if not campaign_request_class:
             raise ValueError(f"Invalid campaign type: {campaign_type}")
         return campaign_request_class.create(**kwargs)
-
-
