@@ -1,6 +1,5 @@
 from typing import Protocol
 
-from playground.core.services.interfaces.memory import shift_repository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
@@ -11,11 +10,11 @@ from playground.core.services.interfaces.memory.shift_repository import ShiftRep
 from playground.core.services.interfaces.service_interfaces.product_service_interface import (
     IProductService,
 )
-from playground.core.services.interfaces.service_interfaces.shift_service_interface import (
-    IShiftService,
-)
 from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
     IReceiptService,
+)
+from playground.core.services.interfaces.service_interfaces.shift_service_interface import (
+    IShiftService,
 )
 
 

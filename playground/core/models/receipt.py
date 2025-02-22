@@ -16,7 +16,7 @@ class Receipt:
     status: str
     products: List[ReceiptItem]
     total: int
-    discounted_total: int | None
+    discounted_total: int
 
     def __eq__(self, other: object) -> bool:
         if other is None or not isinstance(other, type(self)):
@@ -27,15 +27,6 @@ class Receipt:
 @dataclass
 class ReceiptRequest:
     status: str
-
-
-@dataclass
-class ReceiptResponse:
-    id: str
-    status: str
-    products: List[ReceiptItem]
-    total: int
-    discounted_total: int | None
 
 
 @dataclass

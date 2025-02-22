@@ -1,6 +1,5 @@
 from typing import Protocol
 
-from playground.core.services.interfaces.memory import shift_repository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
@@ -16,5 +15,6 @@ class IRepositoryChooser(Protocol):
     def get_receipt_repo(self) -> ReceiptRepository:
         pass
 
-    def get_shift_repo(self) -> ShiftRepository:
-        pass
+    #
+    # def get_shift_repo(self) -> ShiftRepository:
+    #     pass

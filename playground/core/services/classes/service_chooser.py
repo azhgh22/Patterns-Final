@@ -1,6 +1,5 @@
 from playground.core.services.classes.product_service import ProductService
 from playground.core.services.classes.receipt_service import ReceiptService
-from playground.core.services.interfaces.memory import shift_repository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
