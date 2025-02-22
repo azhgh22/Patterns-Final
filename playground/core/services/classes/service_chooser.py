@@ -1,8 +1,9 @@
 from playground.core.services.classes.product_service import ProductService
-from playground.core.services.interfaces.memory import ShiftRepository
+from playground.core.services.classes.shift_service import ShiftService
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
+from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
 from playground.core.services.interfaces.service_interfaces.product_service_interface import (
     IProductService,
 )
@@ -16,4 +17,4 @@ class ServiceChooser:
         return ProductService(product_repo)
 
     def get_shift_service(self, shift_repo: ShiftRepository) -> IShiftService:
-        pass
+        return ShiftService(shift_repo)

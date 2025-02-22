@@ -7,7 +7,7 @@ from playground.core.models.revenue import Revenue
 
 @dataclass
 class XReport:
-    id: str
+    shift_id: str
     num_receipts: int
     products: List[ProductReport]
     revenue: List[Revenue]
@@ -16,7 +16,7 @@ class XReport:
         if other is None or not isinstance(other, type(self)):
             return False
         return (
-            self.id == other.id
+            self.shift_id == other.shift_id
             and self.num_receipts == other.num_receipts
             and self.products == other.products
             and self.revenue == other.revenue

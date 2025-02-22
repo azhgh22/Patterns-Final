@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Revenue:
-    amount: float
     currency_id: str
+    amount: int
 
     def __eq__(self, other: object) -> bool:
         if other is None or not isinstance(other, type(self)):
