@@ -1,5 +1,5 @@
 from typing import Protocol
 
 
-class ProductRepository(Protocol):
+class ShiftRepository(Protocol):
     pass
