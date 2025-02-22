@@ -26,6 +26,17 @@ class ProductRequest:
     price: int
 
 
+@dataclass
+class ProductReport:
+    id: str
+    quantity: int
+
+    def __eq__(self, other: object) -> bool:
+        if other is None or not isinstance(other, type(self)):
+            return False
+        return self.id == other.id and self.quantity == other.quantity
+
+
 # @dataclass
 # class ProductResponse:
 #     id: str

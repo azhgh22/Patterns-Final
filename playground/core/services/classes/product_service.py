@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import uuid4
 
-from playground.core.models.product import ProductRequest, Product
+from playground.core.models.product import Product, ProductRequest
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )

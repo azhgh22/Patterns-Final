@@ -1,10 +1,8 @@
-from fastapi import HTTPException
 from typing import List
 
-from starlette.requests import Request
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
-from fastapi import APIRouter
+from starlette.requests import Request
 
 from playground.core.models.product import Product, ProductRequest
 from playground.core.services.interfaces.service_interfaces.product_service_interface import (
@@ -45,7 +43,7 @@ def create_product(request: Request, product: ProductRequestModel) -> Product:
     except ValueError:
         raise HTTPException(
             status_code=422,
-            detail=f"price can not be negative",
+            detail="price can not be negative",
         )
     return new_product
 
