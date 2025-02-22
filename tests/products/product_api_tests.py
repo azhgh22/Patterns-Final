@@ -16,13 +16,7 @@ from playground.runner.setup import SetupConfiguration, setup
 def get_http(
     product_repo: ProductRepository = ProductInMemoryRepository(),
 ) -> TestClient:
-    return TestClient(
-        setup(
-            SetupConfiguration(
-                repository_chooser=InMemoryChooser(product_repo=product_repo)
-            )
-        )
-    )
+    return TestClient(setup(SetupConfiguration.for_testing(product_repo=product_repo)))
 
 
 def test_should_return_empty_list() -> None:
