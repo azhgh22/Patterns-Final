@@ -21,14 +21,6 @@ from playground.infra.memory.in_memory.shift_in_memory_repository import (
 class ShiftService:
     repo: ShiftRepository = ShiftInMemoryRepository()
 
-    def __validate_receipt(self, shift_id: str, receipt: Receipt) -> bool:
-        open_shift_id = self.get_open_shift_id()
-        if open_shift_id is None or open_shift_id != shift_id:
-            raise IndexError
-        if receipt.status == "close":
-            raise ValueError
-        return True
-
     def open(self) -> Shift:
         if self.get_open_shift_id() is not None:
             raise ValueError
@@ -75,22 +67,20 @@ class ShiftService:
 
         return XReport(shift_id, len(shift_receipt_ids), products, revenue)
 
-    def add_receipt(
-        self, shift_id: str, receipt_id: str, receipt_service: IReceiptService
-    ) -> bool:
-        receipt = receipt_service.get(receipt_id)
-        if not self.__validate_receipt(shift_id, receipt):
-            return False
+    def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
+        open_shift_id = self.get_open_shift_id()
+        if open_shift_id is None or open_shift_id != shift_id:
+            raise IndexError
+        if receipt.status == "close":
+            raise ValueError
 
         self.repo.add_receipt(shift_id, receipt)
         return True
 
-    def remove_receipt(
-        self, shift_id: str, receipt_id: str, receipt_service: IReceiptService
-    ) -> bool:
-        receipt = receipt_service.get(receipt_id)
-        if not self.__validate_receipt(shift_id, receipt):
-            return False
+    def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
+        open_shift_id = self.get_open_shift_id()
+        if open_shift_id is None or open_shift_id != shift_id:
+            raise IndexError
 
         self.repo.remove_receipt(shift_id, receipt_id)
         return True
