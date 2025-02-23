@@ -1,11 +1,21 @@
 from mypy.semanal_shared import Protocol
 
-from playground.core.models.payments import PaymentRequest
+from playground.core.models.payments import PaymentRequest, Payment
+from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
+    IReceiptService,
+)
 
 
 class IPaymentsService(Protocol):
-    def calculate_payment(self, receipt_id: int, currency_id: int) -> int:
+    def calculate_payment(
+        self, receipt_id: str, currency_id: str, receipt_service: IReceiptService
+    ) -> int:
         pass
 
-    def add_payment(self, payment_request: PaymentRequest) -> bool:
+    def add_payment(
+        self, payment_request: PaymentRequest, receipt_service: IReceiptService
+    ) -> Payment:
+        pass
+
+    def get(self, receipt_id: str) -> Payment:
         pass
