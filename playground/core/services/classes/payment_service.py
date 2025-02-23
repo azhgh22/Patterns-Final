@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from forex_python.converter import CurrencyRates
+import requests
 
 from playground.core.models.payments import PaymentRequest, Payment
 from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
@@ -19,16 +19,27 @@ class PaymentService:
         self, receipt_id: str, currency_id: str, receipt_service: IReceiptService
     ) -> int:
         receipt = receipt_service.get(receipt_id)
-        total = receipt.discounted_total
-        converter = CurrencyRates()
-        try:
-            converted_total = converter.convert("GEL", currency_id, total)
-            return int(round(converted_total))
-        except Exception as e:
-            raise IndexError(f"Currency conversion error: {e}")
+        total = (
+            receipt.discounted_total if receipt.discounted_total is not None else receipt.total
+        )
+        url = "https://open.er-api.com/v6/latest/GEL"
+        response = requests.get(url)
+        if response.status_code != 200:
+            raise Exception("Failed to fetch currency rates.")
 
-    # TODO: receipt should be already closed or it should get closed after registering payment
-    def add_payment(
+        data = response.json()
+        rates = data.get("rates", {})
+
+        if currency_id not in rates:
+            raise IndexError(f"Currency {currency_id} is not supported.")
+
+        conversion_rate = rates[currency_id]
+        converted_total = total * conversion_rate
+
+        return int(round(converted_total))
+
+    # TODO: receipt should get closed after registering payment
+    def register_payment(
         self, payment_request: PaymentRequest, receipt_service: IReceiptService
     ) -> Payment:
         amount_in_currency = self.calculate_payment(

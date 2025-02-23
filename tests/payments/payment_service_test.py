@@ -9,7 +9,7 @@ from forex_python.converter import CurrencyRates
 
 class ReceiptServiceMock(IReceiptService):
     def get(self, receipt_id: str) -> Receipt:
-        return Receipt("1", "open", [], 1, 1)
+        return Receipt("1", "open", [], 1000, 1000)
 
 
 def test_env_works() -> None:
