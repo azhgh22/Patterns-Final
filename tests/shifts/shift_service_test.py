@@ -57,8 +57,9 @@ def test_should_get_stored_shift() -> None:
 def test_add_receipt_to_closed_shift_should_fail() -> None:
     shift_list = [Shift("1", ShiftState.CLOSED, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
+    receipt = ReceiptServiceMock().get("1")
     try:
-        service.add_receipt("1", "1", ReceiptServiceMock())
+        service.add_receipt("1", receipt)
         assert False
     except IndexError:
         assert True
@@ -67,8 +68,9 @@ def test_add_receipt_to_closed_shift_should_fail() -> None:
 def test_add_receipt_to_incorrect_shift_should_fail() -> None:
     service = ShiftService(ShiftInMemoryRepository())
     service.open()
+    receipt = ReceiptServiceMock().get("1")
     try:
-        service.add_receipt("incorrect", "1", ReceiptServiceMock())
+        service.add_receipt("incorrect", receipt)
         assert False
     except IndexError:
         assert True
@@ -78,7 +80,7 @@ def test_add_incorrect_receipt_to_shift_should_fail() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     try:
-        service.add_receipt("1", "1", ReceiptServiceMock(Receipt("1", "close", [], 20, 10)))
+        service.add_receipt("1", Receipt("1", "close", [], 20, 10))
         assert False
     except ValueError:
         assert True
@@ -87,7 +89,8 @@ def test_add_incorrect_receipt_to_shift_should_fail() -> None:
 def test_add_receipt_to_shift() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
-    assert service.add_receipt("1", "1", ReceiptServiceMock())
+    receipt = ReceiptServiceMock().get("1")
+    assert service.add_receipt("1", receipt)
     # TODO: should I check x_report?
 
 
@@ -97,5 +100,5 @@ def test_remove_receipt_from_shift() -> None:
     )
     shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
-    assert service.remove_receipt("1", "1", ReceiptServiceMock(receipt))
+    assert service.remove_receipt("1", "1")
     # TODO: should I check x_report?
