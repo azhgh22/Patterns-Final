@@ -34,3 +34,20 @@ class ShiftInMemoryRepository:
                 shift.receipts.append(deepcopy(receipt))
                 return True
         return False
+
+    def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
+        for shift in self.shift_list:
+            if shift.id == shift_id:
+                receipt = next((r for r in shift.receipts if r.id == receipt_id), None)
+                if receipt:
+                    shift.receipts.remove(receipt)
+                    return True
+        return False
+
+    def get_shift_receipt_ids(self, shift_id: str) -> list[str]:
+        return [
+            receipt.id
+            for shift in self.shift_list
+            if shift.id == shift_id
+            for receipt in shift.receipts
+        ]

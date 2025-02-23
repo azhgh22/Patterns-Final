@@ -1,5 +1,6 @@
 from typing import Protocol
 
+from playground.core.models.receipt import Receipt
 from playground.core.models.shift import Shift
 
 
@@ -13,8 +14,11 @@ class ShiftRepository(Protocol):
     def store(self, shift: Shift) -> None:
         pass
 
-    def add_receipt(self, shift_id: str, receipt_id: str) -> bool:
+    def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
         pass
 
     def get_shift_receipt_ids(self, shift_id: str) -> list[str]:
+        pass
+
+    def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
         pass

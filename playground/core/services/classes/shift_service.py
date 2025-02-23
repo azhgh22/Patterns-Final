@@ -4,11 +4,14 @@ from uuid import uuid4
 
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.product import ProductReport
+from playground.core.models.receipt import Receipt
 from playground.core.models.revenue import Revenue
 from playground.core.models.shift import Shift
 from playground.core.models.x_report import XReport
-from playground.core.services.classes.receipt_service import ReceiptService
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
+from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
+    IReceiptService,
+)
 from playground.infra.memory.in_memory.shift_in_memory_repository import (
     ShiftInMemoryRepository,
 )
@@ -18,6 +21,14 @@ from playground.infra.memory.in_memory.shift_in_memory_repository import (
 class ShiftService:
     repo: ShiftRepository = ShiftInMemoryRepository()
 
+    def __validate_receipt(self, shift_id: str, receipt: Receipt) -> bool:
+        open_shift_id = self.get_open_shift_id()
+        if open_shift_id is None or open_shift_id != shift_id:
+            raise IndexError
+        if receipt.status == "close":
+            raise ValueError
+        return True
+
     def open(self) -> Shift:
         if self.get_open_shift_id() is not None:
             raise ValueError
@@ -25,7 +36,7 @@ class ShiftService:
         self.repo.store(shift)
         return shift
 
-    def close(self, shift_id: str, receipt_service: ReceiptService) -> bool:
+    def close(self, shift_id: str, receipt_service: IReceiptService) -> bool:
         if shift_id != self.get_open_shift_id():
             raise IndexError
         receipt_ids = self.repo.get_shift_receipt_ids(shift_id)
@@ -43,8 +54,8 @@ class ShiftService:
     def get_x_report(
         self,
         shift_id: str,
-        receipt_service: ReceiptService,
-        payment_service: PaymentService,
+        receipt_service: IReceiptService,
+        payment_service: IPaymentService,
     ) -> XReport:
         items = defaultdict(int)
         sales = defaultdict(int)
@@ -64,15 +75,22 @@ class ShiftService:
 
         return XReport(shift_id, len(shift_receipt_ids), products, revenue)
 
-    # IMPORTANT: only closed receipts are added to the shift
     def add_receipt(
-        self, shift_id: str, receipt_id: str, receipt_service: ReceiptService
+        self, shift_id: str, receipt_id: str, receipt_service: IReceiptService
     ) -> bool:
-        open_shift_id = self.get_open_shift_id()
-        if open_shift_id is None or open_shift_id != shift_id:
-            raise IndexError
-        if receipt_service.get(receipt_id).status == "open":
-            raise ValueError
+        receipt = receipt_service.get(receipt_id)
+        if not self.__validate_receipt(shift_id, receipt):
+            return False
 
-        self.repo.add_receipt(shift_id, receipt_id)
+        self.repo.add_receipt(shift_id, receipt)
+        return True
+
+    def remove_receipt(
+        self, shift_id: str, receipt_id: str, receipt_service: IReceiptService
+    ) -> bool:
+        receipt = receipt_service.get(receipt_id)
+        if not self.__validate_receipt(shift_id, receipt):
+            return False
+
+        self.repo.remove_receipt(shift_id, receipt_id)
         return True
