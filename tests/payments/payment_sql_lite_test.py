@@ -5,7 +5,6 @@ from sqlite3 import Connection
 import pytest
 
 from playground.core.models.payments import Payment
-from playground.core.models.product import Product
 from playground.infra.memory.sql_lite.payment_sql_lite_repository import PaymentSqlLiteRepository
 
 
@@ -19,10 +18,10 @@ def insert_payment(conn: Connection) -> None:
     conn.commit()
 
 
-def get_payment(conn: Connection) -> Product | None:
+def get_payment(conn: Connection) -> Payment | None:
     raw = conn.execute(
         """
-        select * from payments where id = "my_receipt"
+        select * from payments where receipt_id = "my_receipt"
     """
     ).fetchone()
 
@@ -51,5 +50,12 @@ def test_should_store_new_payment(conn: Connection) -> None:
 
 
 def test_should_not_return_non_existing_payments(conn: Connection) -> None:
-    assert PaymentSqlLiteRepository(conn).get_payment("1") is None
+    assert PaymentSqlLiteRepository(conn).get_payment("my_receipt") is None
+    conn.close()
+
+
+def test_should_return_existing_payments(conn: Connection) -> None:
+    repo = PaymentSqlLiteRepository(conn)
+    insert_payment(conn)
+    assert repo.get_payment("my_receipt") == Payment("my_receipt", "GEL", 10)
     conn.close()

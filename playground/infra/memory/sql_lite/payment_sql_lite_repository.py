@@ -11,7 +11,7 @@ class PaymentSqlLiteRepository:
     def __create_table(self) -> None:
         self.conn.execute("""
                     create table if not exists payments (
-                        receipt_id INTEGER PRIMARY KEY,
+                        receipt_id TEXT PRIMARY KEY,
                         currency_id TEXT NOT NULL,
                         amount INTEGER NOT NULL
                     )
@@ -32,8 +32,8 @@ class PaymentSqlLiteRepository:
         ).fetchone()
         if row:
             return Payment(
-                receipt_id=row["receipt_id"],
-                currency_id=row["currency_id"],
-                amount=row["amount"],
+                receipt_id=row[0],
+                currency_id=row[1],
+                amount=row[2],
             )
         return None
