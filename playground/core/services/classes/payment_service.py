@@ -19,12 +19,10 @@ class PaymentService:
         self, receipt_id: str, currency_id: str, receipt_service: IReceiptService
     ) -> int:
         receipt = receipt_service.get(receipt_id)
-        total = (
-            receipt.discounted_total if receipt.discounted_total is not None else receipt.total
-        )
-        c = CurrencyRates()
+        total = receipt.discounted_total
+        converter = CurrencyRates()
         try:
-            converted_total = c.convert("GEL", currency_id, total)
+            converted_total = converter.convert("GEL", currency_id, total)
             return int(round(converted_total))
         except Exception as e:
             raise IndexError(f"Currency conversion error: {e}")
