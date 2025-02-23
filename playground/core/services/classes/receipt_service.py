@@ -15,6 +15,9 @@ from playground.core.services.interfaces.service_interfaces.campaign_service_int
 from playground.core.services.interfaces.service_interfaces.product_service_interface import (
     IProductService,
 )
+from playground.core.services.interfaces.service_interfaces.shift_service_interface import (
+    IShiftService,
+)
 from playground.infra.memory.in_memory.receipts_in_memory_repository import (
     ReceiptInMemoryRepository,
 )
@@ -24,18 +27,23 @@ from playground.infra.memory.in_memory.receipts_in_memory_repository import (
 class ReceiptService:
     receiptRepo: ReceiptRepository = ReceiptInMemoryRepository()
 
-    def create(self, prod_req: ReceiptRequest) -> Receipt:
+    def create(self, prod_req: ReceiptRequest, shift_service: IShiftService) -> Receipt:
         if prod_req.status != "open":
             raise ValueError("Receipt status should be open.")
+        open_shift_id = shift_service.get_open_shift_id()
+        if open_shift_id is None:
+            raise ValueError("There Are No Open Shifts to Create Receipt.")
+
         receipt_id = str(uuid4())
-        new_receipt = Receipt(receipt_id, "open", [], 0, 0)
+        new_receipt = Receipt(receipt_id, "open", [], 0, None)
         self.receiptRepo.store_receipt(new_receipt)
+        shift_service.add_receipt(open_shift_id, new_receipt)
         return new_receipt
 
-    def close(self, campaign_service: ICampaignService) -> Receipt:
+    def close(self, campaign_service: ICampaignService, shift_service: IShiftService) -> Receipt:
         pass
 
-    def delete(self, receipt_id: str) -> None:
+    def delete(self, receipt_id: str, shift_service: IShiftService) -> None:
         if not self.receiptRepo.contains_receipt(receipt_id):
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         self.receiptRepo.delete_receipt(receipt_id)

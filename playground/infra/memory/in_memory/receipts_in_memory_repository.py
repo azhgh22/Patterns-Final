@@ -40,10 +40,16 @@ class ReceiptInMemoryRepository:
     ) -> Receipt | None:
         receipt = self.get_receipt(receipt_id)
 
-        if receipt is None or receipt.status != "open":
+        if receipt is None or receipt.status != "open" or product is None:
             return None
-        receipt.products.append(
-            ReceiptItem(product.id, quantity, product.price, product.price * quantity)
-        )
+
+        receipt_item = receipt.get_receipt_item(product)
+        if receipt_item is None:
+            receipt.products.append(
+                ReceiptItem(product.id, quantity, product.price, product.price * quantity)
+            )
+        else:
+            receipt_item.add_item(quantity)
+
         receipt.total += product.price * quantity
         return receipt

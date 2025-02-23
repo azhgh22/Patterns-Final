@@ -55,7 +55,7 @@ def test_should_create_receipt() -> None:
 
 
 def test_should_not_add_non_existing_product() -> None:
-    receipts_list = [Receipt("1", "open", [], 0, 0)]
+    receipts_list = [Receipt("1", "open", [], 0, None)]
     response = get_http(receipt_repo=ReceiptInMemoryRepository(receipts_list)).post(
         "receipts/11/products", json={"id": "11", "quantity": 3}
     )
@@ -74,7 +74,7 @@ def test_should_not_add_product_to_non_existing_receipt() -> None:
 
 def test_should_not_add_product_to_closed_receipt() -> None:
     product_list = [Product("1", "vashli", "111", 4)]
-    receipt_list = [Receipt("11", "closed", [], 0, 0)]
+    receipt_list = [Receipt("11", "closed", [], 0, None)]
     response = get_http(
         product_repo=ProductInMemoryRepository(product_list),
         receipt_repo=ReceiptInMemoryRepository(receipt_list),
@@ -84,7 +84,7 @@ def test_should_not_add_product_to_closed_receipt() -> None:
 
 
 def test_should_add_product_to_receipt() -> None:
-    receipt_list = [Receipt("11", "open", [], 0, 0)]
+    receipt_list = [Receipt("11", "open", [], 0, None)]
     product_list = [Product("1", "vashli", "111", 4)]
     response = get_http(
         product_repo=ProductInMemoryRepository(product_list),

@@ -7,16 +7,19 @@ from playground.core.services.interfaces.service_interfaces.campaign_service_int
 from playground.core.services.interfaces.service_interfaces.product_service_interface import (
     IProductService,
 )
+from playground.core.services.interfaces.service_interfaces.shift_service_interface import (
+    IShiftService,
+)
 
 
 class IReceiptService(Protocol):
-    def create(self, prod_req: ReceiptRequest) -> Receipt:
+    def create(self, prod_req: ReceiptRequest, shift_service: IShiftService) -> Receipt:
         pass
 
-    def close(self, campaign_service: ICampaignService) -> Receipt:
+    def close(self, campaign_service: ICampaignService, shift_service: IShiftService) -> Receipt:
         pass
 
-    def delete(self, receipt_id: str) -> None:
+    def delete(self, receipt_id: str, shift_service: IShiftService) -> None:
         pass
 
     def get(self, receipt_id: str) -> Receipt:

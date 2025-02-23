@@ -33,7 +33,9 @@ def create_receipt(request: Request, receipt_request: ReceiptCreateRequest) -> R
     receipt_req_model = ReceiptRequest(receipt_request.status)
     receipt_service = get_receipt_service(request)
     try:
-        return receipt_service.create(receipt_req_model)
+        return receipt_service.create(
+            receipt_req_model,
+        )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 

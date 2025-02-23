@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+from playground.core.models.product import Product
+
 
 @dataclass
 class ReceiptItem:
@@ -9,6 +11,9 @@ class ReceiptItem:
     price: int
     total: int
 
+    def add_item(self, num_items: int):
+        self.quantity += num_items
+
 
 @dataclass
 class Receipt:
@@ -16,12 +21,18 @@ class Receipt:
     status: str
     products: List[ReceiptItem]
     total: int
-    discounted_total: int
+    discounted_total: int | None
 
     def __eq__(self, other: object) -> bool:
         if other is None or not isinstance(other, type(self)):
             return False
         return self.id == other.id
+
+    def get_receipt_item(self, product: Product) -> ReceiptItem | None:
+        for p in self.products:
+            if p.product_id == product.id:
+                return p
+        return None
 
 
 @dataclass
