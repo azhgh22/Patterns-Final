@@ -10,7 +10,7 @@ class ShiftInMemoryRepository:
     def __init__(self, shift_list: List[Shift] | None = None) -> None:
         if shift_list is None:
             shift_list = []
-        self.shift_list = shift_list
+        self.shift_list = deepcopy(shift_list)
 
     def get_open_shift_id(self) -> str | None:
         for shift in self.shift_list:
@@ -26,7 +26,11 @@ class ShiftInMemoryRepository:
         return False
 
     def store(self, shift: Shift) -> None:
-        self.shift_list.append(shift)
+        self.shift_list.append(deepcopy(shift))
 
     def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
-        pass
+        for shift in self.shift_list:
+            if shift.id == shift_id:
+                shift.receipts.append(deepcopy(receipt))
+                return True
+        return False
