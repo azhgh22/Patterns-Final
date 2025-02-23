@@ -70,3 +70,7 @@ class ReceiptService:
         return self.receiptRepo.add_product_to_receipt(
             receipt_id, product, product_request.quantity
         )
+
+    # TODO: Badri please implement this
+    def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
+        pass

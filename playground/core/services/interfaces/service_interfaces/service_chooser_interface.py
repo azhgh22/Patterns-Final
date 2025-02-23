@@ -3,6 +3,7 @@ from typing import Protocol
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
+from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
 from playground.core.services.interfaces.memory.receipt_repository import (
     ReceiptRepository,
 )
