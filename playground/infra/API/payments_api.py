@@ -25,17 +25,6 @@ def get_payment_service(request: Request) -> IPaymentsService:
     return service_chooser.get_payment_service(repository_chooser.get_payment_repository())
 
 
-@payments_api.get("/", status_code=200)
-def get_payment(request: Request, receipt_id: str) -> Payment:
-    try:
-        return get_payment_service(request).get(receipt_id)
-    except Exception as e:
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND,
-            detail=str(e),
-        )
-
-
 class PaymentRequestModel(BaseModel):
     receipt_id: str
     currency_id: str
@@ -53,18 +42,3 @@ def calculate_payment(request: Request, payment: PaymentRequestModel) -> int:
             detail=str(e),
         )
     return amount
-
-
-@payments_api.post("/register", status_code=201)
-def add_payment(request: Request, payment: PaymentRequestModel) -> Payment:
-    p_request = PaymentRequest(payment.receipt_id, payment.currency_id)
-    try:
-        new_payment = get_payment_service(request).add_payment(
-            p_request, get_receipt_service(request)
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-    return new_payment

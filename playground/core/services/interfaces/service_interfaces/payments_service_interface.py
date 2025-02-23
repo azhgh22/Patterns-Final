@@ -12,7 +12,7 @@ class IPaymentsService(Protocol):
     ) -> int:
         pass
 
-    def add_payment(
+    def register_payment(
         self, payment_request: PaymentRequest, receipt_service: IReceiptService
     ) -> Payment:
         pass
