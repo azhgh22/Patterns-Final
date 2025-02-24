@@ -30,6 +30,11 @@ def test_should_add_campaign() -> None:
     assert res is not None
     assert res.id is not None
     assert res.description.type == "1"
+    try:
+        service.create(CampaignRequestWithType(type="1", params={}))
+        assert False
+    except ValueError:
+        assert True
 
 
 def test_get_all() -> None:

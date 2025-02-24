@@ -18,6 +18,12 @@ class Campaign:
             self.description.type, **self.description.params
         )
 
+    def equals(self, second_campaign: Campaign) -> bool:
+        return (
+            self.description.type == second_campaign.description.type
+            and self.description.params == second_campaign.description.params
+        )
+
 
 @dataclass
 class CampaignRequestWithType:

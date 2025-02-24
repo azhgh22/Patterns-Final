@@ -11,7 +11,9 @@ class CampaignInMemoryRepository:
         )
 
     def add_campaign(self, campaign: Campaign) -> None:
-        # todo: implement equation check
+        for camp in self.campaigns:
+            if camp.equals(campaign):
+                raise ValueError("Campaign already exists")
         self.campaigns.append(campaign)
 
     def get_by_id(self, campaign_id) -> Campaign:
