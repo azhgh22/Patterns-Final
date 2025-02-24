@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from starlette.requests import Request
-from starlette.status import HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_400_BAD_REQUEST
 
-from playground.core.models.payments import PaymentRequest, Payment
 from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
     IPaymentsService,
 )
