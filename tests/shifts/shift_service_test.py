@@ -7,6 +7,7 @@ from playground.core.models.receipt import Receipt, ReceiptItem
 from playground.core.models.revenue import Revenue
 from playground.core.models.shift import Shift
 from playground.core.models.x_report import XReport
+from playground.core.services.classes.payment_service import PaymentService
 from playground.core.services.classes.shift_service import ShiftService
 from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
     IPaymentsService,
@@ -15,7 +16,7 @@ from playground.infra.memory.in_memory.shift_in_memory_repository import ShiftIn
 
 
 @dataclass
-class PaymentsServiceMock(IPaymentsService):
+class PaymentsServiceMock(PaymentService):
     def __init__(self, payment: Payment = Payment("1", "GEL", 10)):
         self.payment = payment
 

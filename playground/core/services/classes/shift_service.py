@@ -47,8 +47,8 @@ class ShiftService:
         shift_id: str,
         payment_service: IPaymentsService,
     ) -> XReport:
-        items = defaultdict(int)
-        sales = defaultdict(int)
+        items: dict[str, int] = defaultdict(int)
+        sales: dict[str, int] = defaultdict(int)
 
         shift_receipts = self.repo.get_shift_receipts(shift_id)
 

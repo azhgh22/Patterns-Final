@@ -14,5 +14,5 @@ class ErApiConverter:
         if to_currency not in rates:
             raise IndexError(f"Currency {to_currency} is not supported.")
 
-        conversion_rate = rates[to_currency]
+        conversion_rate = float(rates[to_currency])
         return amount * conversion_rate

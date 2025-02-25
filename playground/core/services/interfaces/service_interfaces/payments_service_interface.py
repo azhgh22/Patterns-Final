@@ -1,4 +1,4 @@
-from mypy.semanal_shared import Protocol
+from typing import Protocol
 
 from playground.core.models.payments import PaymentRequest, Payment
 from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (

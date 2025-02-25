@@ -6,6 +6,9 @@ from playground.core.services.interfaces.memory.shift_repository import ShiftRep
 from playground.core.services.interfaces.memory.receipt_repository import (
     ReceiptRepository,
 )
+from playground.infra.memory.in_memory.payment_in_memory_repository import (
+    PaymentInMemoryRepository,
+)
 from playground.infra.memory.in_memory.products_in_memory_repository import (
     ProductInMemoryRepository,
 )
@@ -23,7 +26,7 @@ class InMemoryChooser:
         product_repo: ProductRepository = ProductInMemoryRepository(),
         shift_repo: ShiftRepository = ShiftInMemoryRepository(),
         receipt_repo: ReceiptRepository = ReceiptInMemoryRepository(),
-        payment_repo: PaymentRepository = PaymentRepository(),
+        payment_repo: PaymentRepository = PaymentInMemoryRepository(),
     ) -> None:
         self.product_repository = product_repo
         self.shift_repository = shift_repo

@@ -1,6 +1,7 @@
 from playground.core.models.payments import Payment, PaymentRequest
 from playground.core.models.receipt import Receipt
 from playground.core.services.classes.payment_service import PaymentService
+from playground.core.services.classes.receipt_service import ReceiptService
 from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
     IReceiptService,
 )
@@ -9,7 +10,7 @@ from playground.infra.memory.in_memory.payment_in_memory_repository import (
 )
 
 
-class ReceiptServiceMock(IReceiptService):
+class ReceiptServiceMock(ReceiptService):
     def __init__(self, receipt: Receipt = Receipt("1", "1", "open", [], 20, 10)) -> None:
         self.receipt = receipt
 
