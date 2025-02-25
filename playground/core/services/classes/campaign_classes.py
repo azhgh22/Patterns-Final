@@ -43,7 +43,8 @@ class BuyNGetNCampaign(CampaignInterface):
     def apply(self, receipt: Receipt) -> Receipt:
         for item in receipt.products:
             if item.product_id == self.product_id and item.quantity >= self.required_quantity:
-                item.quantity += self.required_quantity
+                item.quantity += item.quantity
+        receipt.discounted_total = receipt.total
         return receipt
 
     def to_request(self) -> CampaignRequestWithType:
@@ -73,9 +74,15 @@ class DiscountCampaign(CampaignInterface):
         self.discount_percentage = discount_percentage
 
     def apply(self, receipt: Receipt) -> Receipt:
+        new_total = 0
+        receipt.discounted_total = receipt.total
+        applied = False
         for item in receipt.products:
             if item.product_id == self.applicable_product:
                 item.price *= round(1 - self.discount_percentage / 100)
+                new_total += item.price
+        if applied:
+            receipt.discounted_total = new_total
         return receipt
 
     def to_request(self) -> CampaignRequestWithType:
@@ -106,12 +113,16 @@ class ComboCampaign(CampaignInterface):
         self.discount_percentage = discount_percentage
 
     def apply(self, receipt: Receipt) -> Receipt:
+        receipt.discounted_total = receipt.total
         if all(
             any(item.product_id == pid for item in receipt.products) for pid in self.product_ids
         ):
+            new_total = 0
             for item in receipt.products:
                 if item.product_id in self.product_ids:
                     item.price *= round(1 - self.discount_percentage / 100)
+                    new_total += item.price
+            receipt.discounted_total = new_total
         return receipt
 
     @classmethod
