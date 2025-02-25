@@ -33,6 +33,7 @@ class ReceiptService:
 
         receipt_id = str(uuid4())
         new_receipt = shift_service.add_receipt(Receipt(receipt_id, "", "open", [], 0, None))
+        self.receiptRepo.store_receipt(new_receipt)
         return new_receipt
 
     def close(self, campaign_service: ICampaignService, shift_service: IShiftService) -> Receipt:

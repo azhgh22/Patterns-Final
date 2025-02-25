@@ -6,6 +6,7 @@ from playground.core.models.receipt import AddProductRequest, Receipt, ReceiptRe
 from playground.core.models.shift import Shift
 from playground.core.services.classes.product_service import ProductService
 from playground.core.services.classes.receipt_service import ReceiptService
+from playground.core.services.classes.shift_service import ShiftService
 from playground.core.services.interfaces.service_interfaces.shift_service_interface import (
     IShiftService,
 )
@@ -15,27 +16,29 @@ from playground.infra.memory.in_memory.products_in_memory_repository import (
 from playground.infra.memory.in_memory.receipts_in_memory_repository import (
     ReceiptInMemoryRepository,
 )
+from playground.infra.memory.in_memory.shift_in_memory_repository import ShiftInMemoryRepository
 
 
-class ShiftServiceMock(IShiftService):
-    def __init__(self, shift: Shift = Shift("11", ShiftState.OPEN, [])):
-        self.open_shift = shift
-        self.closed_shifts: List[Shift] = []
-
-    def get_open_shift_id(self) -> str | None:
-        return self.open_shift.id
-
-    def add_receipt(self, receipt: Receipt) -> Receipt:
-        if receipt is None:
-            assert ValueError("receipt does not exists")
-        return Receipt(
-            receipt.id,
-            self.open_shift.id,
-            receipt.status,
-            receipt.products,
-            receipt.total,
-            receipt.discounted_total,
-        )
+#
+# class ShiftServiceMock(IShiftService):
+#     def __init__(self, shift: Shift = Shift("11", ShiftState.OPEN, [])):
+#         self.open_shift = shift
+#         self.closed_shifts: List[Shift] = []
+#
+#     def get_open_shift_id(self) -> str | None:
+#         return self.open_shift.id
+#
+#     def add_receipt(self, receipt: Receipt) -> Receipt:
+#         if receipt is None:
+#             assert ValueError("receipt does not exists")
+#         return Receipt(
+#             receipt.id,
+#             self.open_shift.id,
+#             receipt.status,
+#             receipt.products,
+#             receipt.total,
+#             receipt.discounted_total,
+#         )
 
 
 def test_env_works() -> None:
@@ -44,13 +47,16 @@ def test_env_works() -> None:
 
 def test_should_not_create_receipt_wrong_status() -> None:
     try:
-        ReceiptService().create(ReceiptRequest("close"), ShiftServiceMock())
+        ReceiptService().create(ReceiptRequest("close"), ShiftService())
     except ValueError as e:
         assert "should be open" in str(e)
 
 
 def test_should_store_receipt() -> None:
-    new_receipt = ReceiptService().create(ReceiptRequest("open"), ShiftServiceMock())
+    shifts = [Shift("11", ShiftState.OPEN, [])]
+    new_receipt = ReceiptService().create(
+        ReceiptRequest("open"), ShiftService(ShiftInMemoryRepository(shifts))
+    )
     assert isinstance(new_receipt, Receipt)
     assert new_receipt is not None
 
@@ -59,7 +65,7 @@ def test_should_not_delete_non_existing_receipt() -> None:
     service = ReceiptService(ReceiptInMemoryRepository())
 
     try:
-        service.delete("11", ShiftServiceMock)
+        service.delete("11", ShiftService)
     except ValueError as e:
         assert "does not exist" in str(e)
 
@@ -67,7 +73,7 @@ def test_should_not_delete_non_existing_receipt() -> None:
 def test_should_delete_existing_receipt() -> None:
     rec_list = [Receipt("11", "", "open", [], 0, None)]
     service = ReceiptService(ReceiptInMemoryRepository(rec_list))
-    assert not service.delete("11", ShiftServiceMock())  # if there is no assertions its good
+    assert not service.delete("11", ShiftService())  # if there is no assertions its good
     assert len(rec_list) == 0
 
 
