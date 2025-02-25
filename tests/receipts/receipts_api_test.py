@@ -100,3 +100,18 @@ def test_should_add_product_to_receipt() -> None:
     assert response.status_code == 200
     assert len(receipt_list[0].products) == 1
     assert receipt_list[0].products[0].product_id == "1"
+
+
+def test_should_not_delete_non_existing_receipt() -> None:
+    response = get_http().delete("/receipts/11")
+    assert response.status_code == 400
+    assert "does not exist" in response.json()["detail"]
+
+
+def test_should_not_delete_closed_receipt() -> None:
+    receipts_list = [Receipt("11", "", "closed", [], 0, None)]
+    response = get_http(receipt_repo=ReceiptInMemoryRepository(receipts_list)).delete(
+        "/receipts/11"
+    )
+    assert response.status_code == 400
+    assert "already Closed" in response.json()["detail"]

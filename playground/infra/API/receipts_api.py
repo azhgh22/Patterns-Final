@@ -56,3 +56,12 @@ def add_product(
         return service.add_product(receipt_id, add_product_request, get_product_service(request))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@receipts_api.delete("/{receipt_id}", status_code=status.HTTP_200_OK)
+def delete_receipt(request: Request, receipt_id: str):
+    service = get_receipt_service(request)
+    try:
+        service.delete(receipt_id, get_shift_service(request))
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

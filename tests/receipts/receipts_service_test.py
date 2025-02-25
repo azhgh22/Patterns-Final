@@ -144,3 +144,12 @@ def test_should_not_add_product_to_not_opened_receipt() -> None:
         receipt_service.add_product("11", product_request, product_service)
     except ValueError as e:
         assert "should be open" in str(e)
+
+
+def test_should_not_delete_open_receipt() -> None:
+    receipt = Receipt("11", "", "closed", [], 0, None)
+    service = ReceiptService(ReceiptInMemoryRepository([receipt]))
+    try:
+        service.delete("11", ShiftService())
+    except ValueError as e:
+        assert "already Closed" in str(e)
