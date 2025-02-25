@@ -9,6 +9,9 @@ from playground.core.models.revenue import Revenue
 from playground.core.models.shift import Shift
 from playground.core.models.x_report import XReport
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
+from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
+    IPaymentsService,
+)
 from playground.infra.memory.in_memory.shift_in_memory_repository import (
     ShiftInMemoryRepository,
 )
@@ -42,7 +45,7 @@ class ShiftService:
     def get_x_report(
         self,
         shift_id: str,
-        # payment_service: IPaymentService,
+        payment_service: IPaymentsService,
     ) -> XReport:
         items = defaultdict(int)
         sales = defaultdict(int)
@@ -51,12 +54,14 @@ class ShiftService:
 
         for receipt in shift_receipts:
             for item in receipt.products:
-                items[item.product_id] += item.total
+                items[item.product_id] += item.quantity
 
-            # payment = payment_service.get(receipt.id)
-            # sales[payment.currency_id] += payment.amount
+            payment = payment_service.get(receipt.id)
+            sales[payment.currency_id] += payment.amount
 
-        products = [ProductReport(product_id, amount) for product_id, amount in items.items()]
+        products = [
+            ProductReport(product_id, quantity) for product_id, quantity in items.items()
+        ]
         revenue = [Revenue(currency_id, amount) for currency_id, amount in sales.items()]
 
         return XReport(shift_id, len(shift_receipts), products, revenue)

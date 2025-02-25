@@ -1,8 +1,26 @@
+from dataclasses import dataclass
+
 from playground.core.enums.shift_state import ShiftState
+from playground.core.models.payments import Payment
+from playground.core.models.product import ProductReport
 from playground.core.models.receipt import Receipt, ReceiptItem
+from playground.core.models.revenue import Revenue
 from playground.core.models.shift import Shift
+from playground.core.models.x_report import XReport
 from playground.core.services.classes.shift_service import ShiftService
+from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
+    IPaymentsService,
+)
 from playground.infra.memory.in_memory.shift_in_memory_repository import ShiftInMemoryRepository
+
+
+@dataclass
+class PaymentsServiceMock(IPaymentsService):
+    def __init__(self, payment: Payment = Payment("1", "GEL", 10)):
+        self.payment = payment
+
+    def get(self, receipt_id: str) -> Payment:
+        return self.payment
 
 
 def test_env_works() -> None:
@@ -112,3 +130,12 @@ def test_close_shift() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     assert service.close("1")
+
+
+def test_x_report() -> None:
+    x_report = XReport("1", 1, [ProductReport("1", 2)], [Revenue("GEL", 10)])
+    receipt = Receipt("1", "1", "closed", [ReceiptItem("1", 2, 5, 10)], 10, 10)
+    shift_list = [Shift("1", ShiftState.CLOSED, [receipt])]
+    service = ShiftService(ShiftInMemoryRepository(shift_list))
+
+    assert service.get_x_report("1", PaymentsServiceMock()) == x_report
