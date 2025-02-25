@@ -9,9 +9,6 @@ from playground.core.models.revenue import Revenue
 from playground.core.models.shift import Shift
 from playground.core.models.x_report import XReport
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
-from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
-    IReceiptService,
-)
 from playground.infra.memory.in_memory.shift_in_memory_repository import (
     ShiftInMemoryRepository,
 )
@@ -28,12 +25,11 @@ class ShiftService:
         self.repo.store(shift)
         return shift
 
-    def close(self, shift_id: str, receipt_service: IReceiptService) -> bool:
+    def close(self, shift_id: str) -> bool:
         if shift_id != self.get_open_shift_id():
             raise IndexError
-        receipt_ids = self.repo.get_shift_receipt_ids(shift_id)
-        for receipt_id in receipt_ids:
-            receipt = receipt_service.get(receipt_id)
+        receipts = self.repo.get_shift_receipts(shift_id)
+        for receipt in receipts:
             # TODO: change it to use enum
             if receipt.status == "open":
                 return False
@@ -46,26 +42,24 @@ class ShiftService:
     def get_x_report(
         self,
         shift_id: str,
-        receipt_service: IReceiptService,
         payment_service: IPaymentService,
     ) -> XReport:
         items = defaultdict(int)
         sales = defaultdict(int)
 
-        shift_receipt_ids = self.repo.get_shift_receipt_ids(shift_id)
+        shift_receipts = self.repo.get_shift_receipts(shift_id)
 
-        for receipt_id in shift_receipt_ids:
-            receipt = receipt_service.get(receipt_id)
+        for receipt in shift_receipts:
             for item in receipt.products:
                 items[item.product_id] += item.total
 
-            payment = payment_service.get(receipt_id)
+            payment = payment_service.get(receipt.id)
             sales[payment.currency_id] += payment.amount
 
         products = [ProductReport(product_id, amount) for product_id, amount in items.items()]
         revenue = [Revenue(currency_id, amount) for currency_id, amount in sales.items()]
 
-        return XReport(shift_id, len(shift_receipt_ids), products, revenue)
+        return XReport(shift_id, len(shift_receipts), products, revenue)
 
     def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
         open_shift_id = self.get_open_shift_id()

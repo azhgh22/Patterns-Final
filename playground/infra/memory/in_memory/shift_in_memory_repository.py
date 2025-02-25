@@ -44,10 +44,7 @@ class ShiftInMemoryRepository:
                     return True
         return False
 
-    def get_shift_receipt_ids(self, shift_id: str) -> list[str]:
-        return [
-            receipt.id
-            for shift in self.shift_list
-            if shift.id == shift_id
-            for receipt in shift.receipts
-        ]
+    def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
+        for shift in self.shift_list:
+            if shift.id == shift_id:
+                return shift.receipts

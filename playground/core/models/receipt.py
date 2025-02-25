@@ -13,6 +13,7 @@ class ReceiptItem:
 @dataclass
 class Receipt:
     id: str
+    shift_id: str
     status: str
     products: List[ReceiptItem]
     total: int

@@ -17,7 +17,7 @@ class ShiftRepository(Protocol):
     def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
         pass
 
-    def get_shift_receipt_ids(self, shift_id: str) -> list[str]:
+    def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
         pass
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
