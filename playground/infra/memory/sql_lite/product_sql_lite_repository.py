@@ -36,7 +36,7 @@ class ProductSqlLiteRepository:
         updated_rows = self.conn.execute(f"""
                     update products
                     set price={price}
-                    where id = {p_id}
+                    where id = '{p_id}';
                 """).rowcount
         return updated_rows == 1
 
