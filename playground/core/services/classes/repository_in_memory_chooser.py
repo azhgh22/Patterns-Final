@@ -42,5 +42,5 @@ class InMemoryChooser:
     def get_receipt_repo(self) -> ReceiptRepository:
         return self.receipt_repository
 
-    def get_payment_repository(self) -> PaymentRepository:
+    def get_payment_repo(self) -> PaymentRepository:
         return self.payment_repository

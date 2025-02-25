@@ -73,7 +73,11 @@ def test_add_receipt_to_closed_shift_should_fail() -> None:
 def test_add_incorrect_receipt_to_shift_should_fail() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
-    assert service.add_receipt(Receipt("1", "", "close", [], 20, 10)) is None
+    try:
+        service.add_receipt(Receipt("1", "", "close", [], 20, 10))
+        assert False
+    except ValueError:
+        assert True
 
 
 def test_add_receipt_to_shift() -> None:

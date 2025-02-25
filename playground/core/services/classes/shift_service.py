@@ -66,12 +66,12 @@ class ShiftService:
 
         return XReport(shift_id, len(shift_receipts), products, revenue)
 
-    def add_receipt(self, receipt: Receipt) -> Receipt | None:
+    def add_receipt(self, receipt: Receipt) -> Receipt:
         open_shift_id = self.get_open_shift_id()
         if open_shift_id is None:
             raise ValueError("Open shift to start working")
         if receipt.status == "close":
-            return None
+            raise ValueError("Receipt is closed!!!")
 
         updated_receipt = self.repo.add_receipt(open_shift_id, receipt)
         return updated_receipt

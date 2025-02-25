@@ -22,8 +22,8 @@ class SqlLiteChooser:
     def get_receipt_repo(self) -> ReceiptRepository:
         pass
 
-    def get_shift_repository(self) -> ShiftRepository:
+    def get_shift_repo(self) -> ShiftRepository:
         pass
 
-    def get_payment_repository(self) -> PaymentRepository:
+    def get_payment_repo(self) -> PaymentRepository:
         pass

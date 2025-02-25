@@ -15,6 +15,7 @@ from playground.core.services.interfaces.service_interfaces.service_chooser_inte
 from playground.infra.API.payments_api import payments_api
 from playground.infra.API.products_api import products_api
 from playground.infra.API.receipts_api import receipts_api
+from playground.infra.API.shifts_api import shifts_api
 
 
 @dataclass
@@ -26,7 +27,8 @@ class SetupConfiguration:
 def set_up_routes(api: FastAPI) -> None:
     api.include_router(products_api, prefix="/products", tags=["Products"])
     api.include_router(receipts_api, prefix="/receipts", tags=["receipts"])
-    api.include_router(payments_api, prefix="/payments", tags=["receipts"])
+    api.include_router(payments_api, prefix="/payments", tags=["payments"])
+    api.include_router(shifts_api, prefix="/shifts", tags=["shifts"])
 
 
 def setup(setup_conf: SetupConfiguration) -> FastAPI:

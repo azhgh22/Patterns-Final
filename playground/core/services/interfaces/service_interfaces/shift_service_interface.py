@@ -25,7 +25,7 @@ class IShiftService(Protocol):
     ) -> XReport:
         pass
 
-    def add_receipt(self, receipt: Receipt) -> Receipt | None:
+    def add_receipt(self, receipt: Receipt) -> Receipt:
         pass
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
