@@ -14,10 +14,10 @@ class ShiftRepository(Protocol):
     def store(self, shift: Shift) -> None:
         pass
 
-    def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
+    def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt | None:
         pass
 
-    def get_shift_receipt_ids(self, shift_id: str) -> list[str]:
+    def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
         pass
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:

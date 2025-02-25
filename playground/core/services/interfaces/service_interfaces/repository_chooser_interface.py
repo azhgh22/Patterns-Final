@@ -16,5 +16,5 @@ class IRepositoryChooser(Protocol):
     def get_receipt_repo(self) -> ReceiptRepository:
         pass
 
-    def get_shift_repository(self) -> ShiftRepository:
+    def get_shift_repo(self) -> ShiftRepository:
         pass
