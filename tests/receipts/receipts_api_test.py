@@ -1,5 +1,6 @@
 from starlette.testclient import TestClient
 
+from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.product import Product
 from playground.core.models.receipt import Receipt
@@ -44,7 +45,7 @@ def test_should_not_create_receipt() -> None:
     try:
         get_http().post("/receipts", json={"status": "close"})
     except ValueError as e:
-        raise "should be open" in str(e)
+        assert "should be open" in str(e)
 
 
 def test_should_create_receipt() -> None:
@@ -62,7 +63,7 @@ def test_should_create_receipt() -> None:
 
 
 def test_should_not_add_non_existing_product() -> None:
-    receipts_list = [Receipt("1", "", "open", [], 0, None)]
+    receipts_list = [Receipt("1", "", ReceiptStatus.OPEN, [], 0, None)]
     response = get_http(receipt_repo=ReceiptInMemoryRepository(receipts_list)).post(
         "receipts/11/products", json={"id": "11", "quantity": 3}
     )
@@ -81,7 +82,7 @@ def test_should_not_add_product_to_non_existing_receipt() -> None:
 
 def test_should_not_add_product_to_closed_receipt() -> None:
     product_list = [Product("1", "vashli", "111", 4)]
-    receipt_list = [Receipt("11", "", "closed", [], 0, None)]
+    receipt_list = [Receipt("11", "", ReceiptStatus.CLOSED, [], 0, None)]
     response = get_http(
         product_repo=ProductInMemoryRepository(product_list),
         receipt_repo=ReceiptInMemoryRepository(receipt_list),
@@ -91,7 +92,7 @@ def test_should_not_add_product_to_closed_receipt() -> None:
 
 
 def test_should_add_product_to_receipt() -> None:
-    receipt_list = [Receipt("11", "", "open", [], 0, None)]
+    receipt_list = [Receipt("11", "", ReceiptStatus.OPEN, [], 0, None)]
     product_list = [Product("1", "vashli", "111", 4)]
     response = get_http(
         product_repo=ProductInMemoryRepository(product_list),
@@ -109,7 +110,7 @@ def test_should_not_delete_non_existing_receipt() -> None:
 
 
 def test_should_not_delete_closed_receipt() -> None:
-    receipts_list = [Receipt("11", "", "closed", [], 0, None)]
+    receipts_list = [Receipt("11", "", ReceiptStatus.CLOSED, [], 0, None)]
     response = get_http(receipt_repo=ReceiptInMemoryRepository(receipts_list)).delete(
         "/receipts/11"
     )

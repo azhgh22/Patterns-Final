@@ -64,12 +64,13 @@ class ReceiptService:
         product_service: IProductService,
     ) -> Receipt:
         product = product_service.get_product(product_request.id)
+        receipt = self.receiptRepo.get_receipt(receipt_id)
         if product is None:
             raise ValueError(f"Product with id {product_request.id} does not exist.")
-        elif not self.receiptRepo.contains_receipt(receipt_id):
+        elif receipt is None:
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
-        elif self.receiptRepo.get_receipt(receipt_id).status != ReceiptStatus.OPEN:
+        elif receipt.status != ReceiptStatus.OPEN:
             raise ValueError("Receipt status should be open.")
         return self.receiptRepo.add_product_to_receipt(
-            receipt_id, product, product_request.quantity
+            receipt, product, product_request.quantity
         )

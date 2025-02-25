@@ -41,7 +41,7 @@ def test_should_not_delete_non_existing_receipt() -> None:
     service = ReceiptService(ReceiptInMemoryRepository())
 
     try:
-        service.delete("11", ShiftService)
+        service.delete("11", ShiftService())
     except ValueError as e:
         assert "does not exist" in str(e)
 
@@ -50,7 +50,7 @@ def test_should_delete_existing_receipt() -> None:
     rec_list = [Receipt("11", "", ReceiptStatus.OPEN, [], 0, None)]
     shift_list = [Shift("11", ShiftState.OPEN, [])]
     service = ReceiptService(ReceiptInMemoryRepository(rec_list))
-    assert not service.delete(
+    service.delete(
         "11", ShiftService(ShiftInMemoryRepository(shift_list))
     )  # if there is no assertions its good
     assert len(rec_list) == 0

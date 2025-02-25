@@ -37,13 +37,8 @@ class ReceiptInMemoryRepository:
         return None
 
     def add_product_to_receipt(
-        self, receipt_id: str, product: Product, quantity: int
-    ) -> Receipt | None:
-        receipt = self.get_receipt(receipt_id)
-
-        if receipt is None or receipt.status != ReceiptStatus.OPEN or product is None:
-            return None
-
+        self, receipt: Receipt, product: Product, quantity: int
+    ) -> Receipt:
         receipt_item = receipt.get_receipt_item(product)
         if receipt_item is None:
             receipt.products.append(
