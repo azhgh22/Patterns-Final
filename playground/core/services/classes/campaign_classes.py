@@ -1,0 +1,138 @@
+from __future__ import annotations
+
+import typing
+from dataclasses import dataclass
+
+from playground.core.models.receipt import Receipt
+
+
+from abc import ABC, abstractmethod
+from typing import List
+
+
+@dataclass
+class CampaignRequestWithType:
+    type: str
+    params: dict[str, typing.Any]
+
+
+from abc import ABC, abstractmethod
+from typing import Any
+
+
+class CampaignInterface(ABC):
+    @abstractmethod
+    def apply(self, receipt: Receipt) -> Receipt:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def create(
+        cls, **kwargs: Any
+    ) -> "CampaignInterface":  # Return type is CampaignInterface
+        pass
+
+    @abstractmethod
+    def to_request(self) -> CampaignRequestWithType:
+        pass
+
+
+class BuyNGetNCampaign(CampaignInterface):
+    def __init__(self, required_quantity: int, product_id: str) -> None:
+        self.required_quantity = required_quantity
+        self.product_id = product_id
+
+    def apply(self, receipt: Receipt) -> Receipt:
+        for item in receipt.products:
+            if item.id == self.product_id and item.quantity >= self.required_quantity:
+                item.quantity += self.required_quantity
+        return receipt
+
+    def to_request(self) -> CampaignRequestWithType:
+        return CampaignRequestWithType(
+            type="buy_n_get_n",
+            params={
+                "required_quantity": self.required_quantity,
+                "product_id": self.product_id,
+            },
+        )
+
+    @classmethod
+    def create(cls, **kwargs: typing.Any) -> CampaignInterface:
+        required_quantity = kwargs.get("required_quantity")
+        product_id = kwargs.get("product_id")
+
+        if not isinstance(required_quantity, int):
+            raise TypeError("required_quantity must be an int")
+        if not isinstance(product_id, str):
+            raise TypeError("product_id must be a str")
+        return cls(required_quantity, product_id)
+
+
+class DiscountCampaign(CampaignInterface):
+    def __init__(self, discount_percentage: float, applicable_product: str) -> None:
+        self.applicable_product = applicable_product
+        self.discount_percentage = discount_percentage
+
+    def apply(self, receipt: Receipt) -> Receipt:
+        for item in receipt.products:
+            if item.id == self.applicable_product:
+                item.price *= 1 - self.discount_percentage / 100
+        return receipt
+
+    def to_request(self) -> CampaignRequestWithType:
+        return CampaignRequestWithType(
+            type="discount",
+            params={
+                "discount_percentage": self.discount_percentage,
+                "applicable_product": self.applicable_product,
+            },
+        )
+
+    @classmethod
+    def create(cls, **kwargs: typing.Any) -> CampaignInterface:
+        discount_percentage = kwargs.get("discount_percentage")
+        applicable_product = kwargs.get("applicable_product")
+        if not isinstance(discount_percentage, (int, float)):
+            raise TypeError("discount_percentage must be a float")
+        if not isinstance(applicable_product, str):
+            raise TypeError("product_id must be a str")
+        return cls(discount_percentage, applicable_product)
+
+
+class ComboCampaign(CampaignInterface):
+    def __init__(self, product_ids: List[str], discount_percentage: float) -> None:
+        if product_ids is None:
+            product_ids = []
+        self.product_ids = product_ids
+        self.discount_percentage = discount_percentage
+
+    def apply(self, receipt: Receipt) -> Receipt:
+        if all(
+            any(item.id == pid for item in receipt.products) for pid in self.product_ids
+        ):
+            for item in receipt.products:
+                if item.id in self.product_ids:
+                    item.price *= 1 - self.discount_percentage / 100
+        return receipt
+
+    @classmethod
+    def create(cls, **kwargs: typing.Any) -> CampaignInterface:
+        product_ids = kwargs.get("product_ids")
+        discount_percentage = kwargs.get("discount_percentage")
+        if not isinstance(product_ids, list) or not all(
+            isinstance(p, str) for p in product_ids
+        ):
+            raise TypeError("product_ids must be a list of strings")
+        if not isinstance(discount_percentage, (int, float)):
+            raise TypeError("discount_percentage must be a float")
+        return cls(product_ids, discount_percentage)
+
+    def to_request(self) -> CampaignRequestWithType:
+        return CampaignRequestWithType(
+            type="combo",
+            params={
+                "product_ids": self.product_ids,
+                "discount_percentage": self.discount_percentage,
+            },
+        )

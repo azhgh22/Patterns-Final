@@ -1,6 +1,12 @@
+from playground.core.services.interfaces.memory.campaign_repository import (
+    CampaignRepository,
+)
 from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
+)
+from playground.infra.memory.in_memory.campaign_in_memory_repository import (
+    CampaignInMemoryRepository,
 )
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
 from playground.core.services.interfaces.memory.receipt_repository import (
@@ -27,11 +33,13 @@ class InMemoryChooser:
         shift_repo: ShiftRepository = ShiftInMemoryRepository(),
         receipt_repo: ReceiptRepository = ReceiptInMemoryRepository(),
         payment_repo: PaymentRepository = PaymentInMemoryRepository(),
+        campaign_repo: CampaignRepository = CampaignInMemoryRepository(),
     ) -> None:
         self.product_repository = product_repo
         self.shift_repository = shift_repo
         self.receipt_repository = receipt_repo
         self.payment_repository = payment_repo
+        self.campaign_repository = campaign_repo
 
     def get_product_repo(self) -> ProductRepository:
         return self.product_repository
@@ -44,3 +52,6 @@ class InMemoryChooser:
 
     def get_payment_repo(self) -> PaymentRepository:
         return self.payment_repository
+
+    def get_campaign_repo(self) -> CampaignRepository:
+        return self.campaign_repository

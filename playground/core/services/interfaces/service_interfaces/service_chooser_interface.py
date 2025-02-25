@@ -1,8 +1,12 @@
 from typing import Protocol
 
+from playground.core.services.interfaces.memory.campaign_repository import CampaignRepository
 from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
+)
+from playground.core.services.interfaces.service_interfaces.campaign_service_interface import (
+    ICampaignService,
 )
 from playground.core.services.interfaces.memory.receipt_repository import (
     ReceiptRepository,
@@ -24,6 +28,9 @@ from playground.core.services.interfaces.service_interfaces.shift_service_interf
 
 class IServiceChooser(Protocol):
     def get_product_service(self, product_repo: ProductRepository) -> IProductService:
+        pass
+
+    def get_campaign_service(self, campaign_repo: CampaignRepository) -> ICampaignService:
         pass
 
     def get_receipt_service(self, receipt_repo: ReceiptRepository) -> IReceiptService:

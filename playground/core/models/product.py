@@ -6,7 +6,7 @@ class Product:
     id: str
     name: str
     barcode: str
-    price: int
+    price: float
 
     def __eq__(self, other: object) -> bool:
         if other is None or not isinstance(other, type(self)):
