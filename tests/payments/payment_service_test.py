@@ -10,7 +10,7 @@ from playground.infra.memory.in_memory.payment_in_memory_repository import (
 
 
 class ReceiptServiceMock(IReceiptService):
-    def __init__(self, receipt: Receipt = Receipt("1", "open", [], 20, 10)) -> None:
+    def __init__(self, receipt: Receipt = Receipt("1", "1", "open", [], 20, 10)) -> None:
         self.receipt = receipt
 
     def get(self, receipt_id: str) -> Receipt:
@@ -45,7 +45,7 @@ def test_should_convert_total_into_currency_closed_receipt() -> None:
 def test_should_convert_open_receipt() -> None:
     payment_service = PaymentService(converter=ConverterMock())
     result = payment_service.calculate_payment(
-        "1", "USD", ReceiptServiceMock(Receipt("1", "open", [], 20, None))
+        "1", "USD", ReceiptServiceMock(Receipt("1", "1", "open", [], 20, None))
     )
     assert result == 40
 

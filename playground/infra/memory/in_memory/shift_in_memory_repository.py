@@ -49,3 +49,5 @@ class ShiftInMemoryRepository:
         for shift in self.shift_list:
             if shift.id == shift_id:
                 return shift.receipts
+
+        return []

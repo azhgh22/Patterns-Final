@@ -33,7 +33,7 @@ class InMemoryChooser:
     def get_product_repo(self) -> ProductRepository:
         return self.product_repository
 
-    def get_shift_repository(self) -> ShiftRepository:
+    def get_shift_repo(self) -> ShiftRepository:
         return self.shift_repository
 
     def get_receipt_repo(self) -> ReceiptRepository:
