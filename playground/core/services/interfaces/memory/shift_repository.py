@@ -22,3 +22,6 @@ class ShiftRepository(Protocol):
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
         pass
+
+    def shift_exists(self, shift_id: str) -> bool:
+        pass

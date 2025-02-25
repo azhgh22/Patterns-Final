@@ -21,7 +21,7 @@ payments_api = APIRouter()
 def get_payment_service(request: Request) -> IPaymentsService:
     service_chooser: IServiceChooser = request.app.state.core
     repository_chooser: IRepositoryChooser = request.app.state.repo
-    return service_chooser.get_payment_service(repository_chooser.get_payment_repository())
+    return service_chooser.get_payment_service(repository_chooser.get_payment_repo())
 
 
 class PaymentRequestModel(BaseModel):

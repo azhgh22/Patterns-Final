@@ -41,8 +41,8 @@ def open_shift(request: Request) -> Shift:
         )
 
 
-@shifts_api.post("/close?{shift_id}", status_code=200)
-def open_shift(request: Request, shift_id: str) -> bool:
+@shifts_api.post("/close/{shift_id}", status_code=200)
+def close_shift(request: Request, shift_id: str) -> bool:
     try:
         return get_shifts_service(request).close(shift_id)
     except IndexError as e:
@@ -52,6 +52,12 @@ def open_shift(request: Request, shift_id: str) -> bool:
         )
 
 
-@shifts_api.get("/x-report?{shift_id}", status_code=200)
-def open_shift(request: Request, shift_id: str) -> XReport:
-    return get_shifts_service(request).get_x_report(shift_id, get_payment_service(request))
+@shifts_api.get("/x-report/{shift_id}", status_code=200)
+def get_x_report(request: Request, shift_id: str) -> XReport:
+    try:
+        return get_shifts_service(request).get_x_report(shift_id, get_payment_service(request))
+    except IndexError as e:
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )

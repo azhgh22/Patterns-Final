@@ -51,3 +51,9 @@ class ShiftInMemoryRepository:
                 return shift.receipts
 
         return []
+
+    def shift_exists(self, shift_id: str) -> bool:
+        for shift in self.shift_list:
+            if shift.id == shift_id:
+                return True
+        return False
