@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.receipt import Receipt, ReceiptItem
 from playground.core.models.shift import Shift
@@ -46,27 +44,24 @@ def test_add_receipt_to_closed_shift_should_fail() -> None:
     shift_list = [Shift("1", ShiftState.CLOSED, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     receipt = Receipt("1", "", "open", [], 20, 10)
-    assert service.add_receipt("1", receipt) is None
-
-
-def test_add_receipt_to_incorrect_shift_should_fail() -> None:
-    service = ShiftService(ShiftInMemoryRepository())
-    service.open()
-    receipt = Receipt("1", "", "open", [], 20, 10)
-    assert service.add_receipt("incorrect", receipt) is None
+    try:
+        service.add_receipt(receipt)
+        assert False
+    except IndexError:
+        assert True
 
 
 def test_add_incorrect_receipt_to_shift_should_fail() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
-    assert service.add_receipt("1", Receipt("1", "", "close", [], 20, 10)) is None
+    assert service.add_receipt(Receipt("1", "", "close", [], 20, 10)) is None
 
 
 def test_add_receipt_to_shift() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     receipt = Receipt("1", "", "open", [], 20, 10)
-    updated_receipt = service.add_receipt("1", receipt)
+    updated_receipt = service.add_receipt(receipt)
     assert updated_receipt is not None
     assert updated_receipt.shift_id == "1"
 
