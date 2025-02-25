@@ -9,9 +9,6 @@ from playground.core.models.shift import Shift
 from playground.core.models.x_report import XReport
 from playground.core.services.classes.payment_service import PaymentService
 from playground.core.services.classes.shift_service import ShiftService
-from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
-    IPaymentsService,
-)
 from playground.infra.memory.in_memory.shift_in_memory_repository import ShiftInMemoryRepository
 
 
@@ -109,7 +106,6 @@ def test_remove_receipt_from_shift() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     assert service.remove_receipt("1", "1")
-    # TODO: should I check x_report?
 
 
 def test_close_incorrect_shift_should_fail() -> None:
@@ -144,3 +140,12 @@ def test_x_report() -> None:
     service = ShiftService(ShiftInMemoryRepository(shift_list))
 
     assert service.get_x_report("1", PaymentsServiceMock()) == x_report
+
+
+def test_x_report_on_non_existing_shift() -> None:
+    service = ShiftService(ShiftInMemoryRepository())
+    try:
+        service.get_x_report("1", PaymentsServiceMock())
+        assert False
+    except IndexError:
+        assert True

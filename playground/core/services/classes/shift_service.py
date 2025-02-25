@@ -23,14 +23,14 @@ class ShiftService:
 
     def open(self) -> Shift:
         if self.get_open_shift_id() is not None:
-            raise ValueError
+            raise ValueError("shift is already open")
         shift = Shift(str(uuid4()), ShiftState.OPEN, [])
         self.repo.store(shift)
         return shift
 
     def close(self, shift_id: str) -> bool:
         if shift_id != self.get_open_shift_id():
-            raise IndexError
+            raise IndexError("open shift doesn't exist")
         receipts = self.repo.get_shift_receipts(shift_id)
         for receipt in receipts:
             # TODO: change it to use enum
@@ -47,6 +47,8 @@ class ShiftService:
         shift_id: str,
         payment_service: IPaymentsService,
     ) -> XReport:
+        if not self.repo.shift_exists(shift_id):
+            raise IndexError("shift doesn't exist")
         items: dict[str, int] = defaultdict(int)
         sales: dict[str, int] = defaultdict(int)
 
@@ -69,9 +71,9 @@ class ShiftService:
     def add_receipt(self, receipt: Receipt) -> Receipt:
         open_shift_id = self.get_open_shift_id()
         if open_shift_id is None:
-            raise ValueError("Open shift to start working")
+            raise ValueError("open shift to start working")
         if receipt.status == "close":
-            raise ValueError("Receipt is closed!!!")
+            raise ValueError("receipt is closed!!!")
 
         updated_receipt = self.repo.add_receipt(open_shift_id, receipt)
         return updated_receipt
