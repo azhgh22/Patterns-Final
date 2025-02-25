@@ -1,6 +1,5 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from multiprocessing.managers import Value
 from uuid import uuid4
 
 from playground.core.enums.shift_state import ShiftState
@@ -75,7 +74,7 @@ class ShiftService:
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
         open_shift_id = self.get_open_shift_id()
         if open_shift_id is None or open_shift_id != shift_id:
-            raise IndexError
+            raise ValueError("open shift doesn't exist")
 
         self.repo.remove_receipt(shift_id, receipt_id)
         return True

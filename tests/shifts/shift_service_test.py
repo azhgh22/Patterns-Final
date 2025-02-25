@@ -66,6 +66,19 @@ def test_add_receipt_to_shift() -> None:
     assert updated_receipt.shift_id == "1"
 
 
+def test_remove_receipt_from_closed_shift_should_fail() -> None:
+    receipt = Receipt(
+        "1", "1", "closed", [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)], 20, 10
+    )
+    shift_list = [Shift("1", ShiftState.CLOSED, [receipt])]
+    service = ShiftService(ShiftInMemoryRepository(shift_list))
+    try:
+        service.remove_receipt("1", "1")
+        assert False
+    except ValueError:
+        assert True
+
+
 def test_remove_receipt_from_shift() -> None:
     receipt = Receipt(
         "1", "1", "open", [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)], 20, 10
@@ -74,3 +87,28 @@ def test_remove_receipt_from_shift() -> None:
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     assert service.remove_receipt("1", "1")
     # TODO: should I check x_report?
+
+
+def test_close_incorrect_shift_should_fail() -> None:
+    shift_list = [Shift("1", ShiftState.OPEN, [])]
+    service = ShiftService(ShiftInMemoryRepository(shift_list))
+    try:
+        service.close("2")
+        assert False
+    except IndexError:
+        assert True
+
+
+def test_close_shift_with_open_receipt_should_fail() -> None:
+    receipt = Receipt(
+        "1", "1", "open", [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)], 20, 10
+    )
+    shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
+    service = ShiftService(ShiftInMemoryRepository(shift_list))
+    assert service.close("1") is False
+
+
+def test_close_shift() -> None:
+    shift_list = [Shift("1", ShiftState.OPEN, [])]
+    service = ShiftService(ShiftInMemoryRepository(shift_list))
+    assert service.close("1")
