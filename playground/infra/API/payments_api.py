@@ -12,7 +12,6 @@ from playground.core.services.interfaces.service_interfaces.repository_chooser_i
 from playground.core.services.interfaces.service_interfaces.service_chooser_interface import (
     IServiceChooser,
 )
-from playground.infra.API.receipts_api import get_receipt_service
 
 payments_api = APIRouter()
 
@@ -25,15 +24,15 @@ def get_payment_service(request: Request) -> IPaymentsService:
 
 
 class PaymentRequestModel(BaseModel):
-    receipt_id: str
     currency_id: str
+    amount: int
 
 
 @payments_api.get("/calculate", status_code=200)
 def calculate_payment(request: Request, payment: PaymentRequestModel) -> int:
     try:
         amount = get_payment_service(request).calculate_payment(
-            payment.receipt_id, payment.currency_id, get_receipt_service(request)
+            payment.currency_id, payment.amount
         )
     except Exception as e:
         raise HTTPException(
