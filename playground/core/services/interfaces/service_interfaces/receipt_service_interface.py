@@ -21,8 +21,9 @@ class IReceiptService(Protocol):
 
     def close(
         self,
+        receipt_id: str,
+        currency_id: str,
         campaign_service: ICampaignService,
-        shift_service: IShiftService,
         payment_service: IPaymentsService,
     ) -> Receipt:
         pass

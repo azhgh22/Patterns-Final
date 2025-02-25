@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from uuid import uuid4
 
 from playground.core.enums.receipt_status import ReceiptStatus
+from playground.core.models.payments import Payment
 from playground.core.models.receipt import (
     AddProductRequest,
     Receipt,
@@ -44,11 +45,27 @@ class ReceiptService:
 
     def close(
         self,
+        receipt_id: str,
+        currency_id: str,
         campaign_service: ICampaignService,
-        shift_service: IShiftService,
         payment_service: IPaymentsService,
     ) -> Receipt:
-        pass
+        receipt = self.receiptRepo.get_receipt(receipt_id)
+        if receipt is None:
+            raise ValueError(f"Receipt with id {receipt_id} not found.")
+        if receipt.status == ReceiptStatus.CLOSED:
+            raise ValueError("Receipt status should not be closed.")
+        updated_receipt = campaign_service.apply(receipt)
+        total = (
+            updated_receipt.discounted_total
+            if updated_receipt.discounted_total
+            else updated_receipt.total
+        )
+        payment = Payment(receipt_id, currency_id, total)
+        payment_service.register_payment(payment)
+        updated_receipt.status = ReceiptStatus.CLOSED
+        self.receiptRepo.close_receipt(updated_receipt)
+        return updated_receipt
 
     def delete(self, receipt_id: str, shift_service: IShiftService) -> None:
         receipt = self.receiptRepo.get_receipt(receipt_id)

@@ -25,3 +25,6 @@ class ReceiptSqlLiteRepository:
         self, receipt: Receipt, product: Product, quantity: int
     ) -> Receipt:
         pass
+
+    def close_receipt(self, updated_receipt) -> None:
+        pass

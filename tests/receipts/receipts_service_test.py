@@ -5,6 +5,8 @@ from playground.core.enums.shift_state import ShiftState
 from playground.core.models.product import Product
 from playground.core.models.receipt import AddProductRequest, Receipt, ReceiptRequest
 from playground.core.models.shift import Shift
+from playground.core.services.classes.campaign_service import CampaignService
+from playground.core.services.classes.payment_service import PaymentService
 from playground.core.services.classes.product_service import ProductService
 from playground.core.services.classes.receipt_service import ReceiptService
 from playground.core.services.classes.shift_service import ShiftService
@@ -134,3 +136,31 @@ def test_should_not_delete_open_receipt() -> None:
         service.delete("11", ShiftService())
     except ValueError as e:
         assert "already Closed" in str(e)
+
+
+def test_should_not_close_non_existing_receipt() -> None:
+    try:
+        service = ReceiptService(ReceiptInMemoryRepository([]))
+        service.close("1", "1", CampaignService(), PaymentService())
+        assert False
+    except ValueError as e:
+        assert "not found" in str(e)
+
+
+def test_should_not_close_already_closed_receipt() -> None:
+    receipt = Receipt("11", "", ReceiptStatus.CLOSED, [], 0, None)
+    service = ReceiptService(ReceiptInMemoryRepository([receipt]))
+    try:
+        service.close("11", "1", CampaignService(), PaymentService())
+        assert False
+    except ValueError as e:
+        assert "should not be closed" in str(e)
+
+
+def test_should_close_receipt() -> None:
+    receipt = Receipt("11", "", ReceiptStatus.OPEN, [], 0, None)
+    service = ReceiptService(ReceiptInMemoryRepository([receipt]))
+    updated_receipt = service.close("11", "GEL", CampaignService(), PaymentService())
+    assert isinstance(updated_receipt, Receipt)
+    assert updated_receipt.id == "11"
+    assert updated_receipt.status == ReceiptStatus.CLOSED
