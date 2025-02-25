@@ -26,5 +26,14 @@ class ReceiptSqlLiteRepository:
     ) -> Receipt:
         pass
 
-    def close_receipt(self, updated_receipt) -> None:
+    def close_receipt(self, updated_receipt: Receipt) -> None:
+        pass
+
+    def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
+        pass
+
+    def get_all_receipts(self, shift_id: str) -> list[Receipt]:
+        pass
+
+    def clear_receipt_shift_id(self, receipt_id: str) -> bool:
         pass
