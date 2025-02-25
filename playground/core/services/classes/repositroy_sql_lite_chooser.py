@@ -6,6 +6,7 @@ from playground.core.services.interfaces.memory.product_repository import (
 )
 from playground.core.services.interfaces.memory.receipt_repository import ReceiptRepository
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
+from playground.infra.memory.sql_lite.payment_sql_lite_repository import PaymentSqlLiteRepository
 from playground.infra.memory.sql_lite.product_sql_lite_repository import (
     ProductSqlLiteRepository,
 )
@@ -15,6 +16,7 @@ class SqlLiteChooser:
     def __init__(self) -> None:
         connection = sqlite3.connect("shop.db", check_same_thread=False)
         self.product_repository = ProductSqlLiteRepository(connection)
+        self.payment_repository = PaymentSqlLiteRepository(connection)
 
     def get_product_repo(self) -> ProductRepository:
         return self.product_repository
@@ -26,4 +28,4 @@ class SqlLiteChooser:
         pass
 
     def get_payment_repo(self) -> PaymentRepository:
-        pass
+        return self.payment_repository
