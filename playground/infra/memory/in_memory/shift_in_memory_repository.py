@@ -28,12 +28,13 @@ class ShiftInMemoryRepository:
     def store(self, shift: Shift) -> None:
         self.shift_list.append(deepcopy(shift))
 
-    def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
+    def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt | None:
         for shift in self.shift_list:
             if shift.id == shift_id:
                 shift.receipts.append(deepcopy(receipt))
-                return True
-        return False
+                receipt.shift_id = shift.id
+                return receipt
+        return None
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
         for shift in self.shift_list:
