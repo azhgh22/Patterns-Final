@@ -1,6 +1,5 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from multiprocessing.managers import Value
 from uuid import uuid4
 
 from playground.core.enums.shift_state import ShiftState
@@ -10,6 +9,9 @@ from playground.core.models.revenue import Revenue
 from playground.core.models.shift import Shift
 from playground.core.models.x_report import XReport
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
+from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
+    IPaymentsService,
+)
 from playground.infra.memory.in_memory.shift_in_memory_repository import (
     ShiftInMemoryRepository,
 )
@@ -43,31 +45,33 @@ class ShiftService:
     def get_x_report(
         self,
         shift_id: str,
-        # payment_service: IPaymentService,
+        payment_service: IPaymentsService,
     ) -> XReport:
-        items = defaultdict(int)
-        sales = defaultdict(int)
+        items: dict[str, int] = defaultdict(int)
+        sales: dict[str, int] = defaultdict(int)
 
         shift_receipts = self.repo.get_shift_receipts(shift_id)
 
         for receipt in shift_receipts:
             for item in receipt.products:
-                items[item.product_id] += item.total
+                items[item.product_id] += item.quantity
 
-            # payment = payment_service.get(receipt.id)
-            # sales[payment.currency_id] += payment.amount
+            payment = payment_service.get(receipt.id)
+            sales[payment.currency_id] += payment.amount
 
-        products = [ProductReport(product_id, amount) for product_id, amount in items.items()]
+        products = [
+            ProductReport(product_id, quantity) for product_id, quantity in items.items()
+        ]
         revenue = [Revenue(currency_id, amount) for currency_id, amount in sales.items()]
 
         return XReport(shift_id, len(shift_receipts), products, revenue)
 
-    def add_receipt(self, receipt: Receipt) -> Receipt | None:
+    def add_receipt(self, receipt: Receipt) -> Receipt:
         open_shift_id = self.get_open_shift_id()
         if open_shift_id is None:
             raise ValueError("Open shift to start working")
         if receipt.status == "close":
-            return None
+            raise ValueError("Receipt is closed!!!")
 
         updated_receipt = self.repo.add_receipt(open_shift_id, receipt)
         return updated_receipt
@@ -75,7 +79,7 @@ class ShiftService:
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
         open_shift_id = self.get_open_shift_id()
         if open_shift_id is None or open_shift_id != shift_id:
-            raise IndexError
+            raise ValueError("open shift doesn't exist")
 
         self.repo.remove_receipt(shift_id, receipt_id)
         return True
