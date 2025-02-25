@@ -15,9 +15,3 @@ class Payment:
             and self.currency_id == other.currency_id
             and self.amount == other.amount
         )
-
-
-@dataclass
-class PaymentRequest:
-    receipt_id: str
-    currency_id: str

@@ -1,11 +1,8 @@
 from dataclasses import dataclass
 
-from playground.core.models.payments import PaymentRequest, Payment
+from playground.core.models.payments import Payment
 from playground.core.services.interfaces.currency_converter_interface import ICurrencyConverter
 from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
-from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
-    IReceiptService,
-)
 from playground.infra.currency_converter.er_api_converter import ErApiConverter
 from playground.infra.memory.in_memory.payment_in_memory_repository import (
     PaymentInMemoryRepository,
@@ -17,22 +14,17 @@ class PaymentService:
     repo: PaymentRepository = PaymentInMemoryRepository()
     converter: ICurrencyConverter = ErApiConverter()
 
-    def calculate_payment(
-        self, receipt_id: str, currency_id: str, receipt_service: IReceiptService
-    ) -> int:
-        receipt = receipt_service.get(receipt_id)
-        total = (
-            receipt.discounted_total if receipt.discounted_total is not None else receipt.total
-        )
-        converted_total = self.converter.convert("GEL", "USD", total)
+    def calculate_payment(self, currency_id: str, amount: int) -> int:
+        converted_total = self.converter.convert("GEL", currency_id, amount)
         return int(round(converted_total))
 
     # TODO: receipt should get closed after registering payment
     def register_payment(
-        self, payment_request: PaymentRequest, receipt_service: IReceiptService
+        self,
+        payment_request: Payment,
     ) -> Payment:
         amount_in_currency = self.calculate_payment(
-            payment_request.receipt_id, payment_request.currency_id, receipt_service
+            payment_request.currency_id, payment_request.amount
         )
         payment = Payment(
             payment_request.receipt_id,
