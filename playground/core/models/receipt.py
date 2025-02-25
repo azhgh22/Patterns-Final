@@ -17,7 +17,7 @@ class Receipt:
     status: str
     products: List[ReceiptItem]
     total: int
-    discounted_total: int
+    discounted_total: int | None
 
     def __eq__(self, other: object) -> bool:
         if other is None or not isinstance(other, type(self)):
