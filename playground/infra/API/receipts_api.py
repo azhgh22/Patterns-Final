@@ -60,7 +60,7 @@ def add_product(
 
 
 @receipts_api.delete("/{receipt_id}", status_code=status.HTTP_200_OK)
-def delete_receipt(request: Request, receipt_id: str):
+def delete_receipt(request: Request, receipt_id: str) -> None:
     service = get_receipt_service(request)
     try:
         service.delete(receipt_id, get_shift_service(request))
