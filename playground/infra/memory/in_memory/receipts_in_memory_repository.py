@@ -1,5 +1,6 @@
 from typing import List
 
+from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.models.product import Product
 from playground.core.models.receipt import (
     Receipt,
@@ -40,7 +41,7 @@ class ReceiptInMemoryRepository:
     ) -> Receipt | None:
         receipt = self.get_receipt(receipt_id)
 
-        if receipt is None or receipt.status != "open" or product is None:
+        if receipt is None or receipt.status != ReceiptStatus.OPEN or product is None:
             return None
 
         receipt_item = receipt.get_receipt_item(product)

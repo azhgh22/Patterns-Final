@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
+from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.models.product import Product
 
 
@@ -19,7 +20,7 @@ class ReceiptItem:
 class Receipt:
     id: str
     shift_id: str
-    status: str
+    status: ReceiptStatus
     products: List[ReceiptItem]
     total: int
     discounted_total: int | None
@@ -38,7 +39,7 @@ class Receipt:
 
 @dataclass
 class ReceiptRequest:
-    status: str
+    status: ReceiptStatus
 
 
 @dataclass

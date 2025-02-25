@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from starlette import status
 from starlette.requests import Request
 
+from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.models.receipt import AddProductRequest, Receipt, ReceiptRequest
 from playground.core.services.interfaces.service_interfaces.receipt_service_interface import (
     IReceiptService,
@@ -34,7 +35,7 @@ def get_shift_service(request: Request) -> IShiftService:
 
 
 class ReceiptCreateRequest(BaseModel):
-    status: str
+    status: ReceiptStatus
 
 
 @receipts_api.post("/", status_code=status.HTTP_201_CREATED)

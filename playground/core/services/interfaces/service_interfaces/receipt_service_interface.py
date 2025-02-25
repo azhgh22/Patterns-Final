@@ -32,6 +32,3 @@ class IReceiptService(Protocol):
         product_service: IProductService,
     ) -> Receipt:
         pass
-
-    def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
-        pass
