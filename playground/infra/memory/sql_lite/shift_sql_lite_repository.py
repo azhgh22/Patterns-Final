@@ -33,7 +33,14 @@ class ShiftSqlLiteRepository:
         return updated_rows == 1
 
     def store(self, shift: Shift) -> None:
-        pass
+        self.conn.execute(
+            """
+            insert into shifts (id,status)
+            values(?,?)
+        """,
+            (shift.id, str(shift.state)),
+        )
+        self.conn.commit()
 
     def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt | None:
         pass

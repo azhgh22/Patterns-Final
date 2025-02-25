@@ -5,8 +5,8 @@ from sqlite3 import Connection
 import pytest
 
 from playground.core.enums.shift_state import ShiftState
+from playground.core.models.receipt import Receipt
 from playground.core.models.shift import Shift
-from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
 from playground.infra.memory.sql_lite.receipt_sql_lite_repository import ReceiptSqlLiteRepository
 from playground.infra.memory.sql_lite.shift_sql_lite_repository import ShiftSqlLiteRepository
 
@@ -37,6 +37,13 @@ def get_shift_status(conn: Connection, shift_id: str) -> str:
             """).fetchone()[0]
 
 
+def get_shift_receipts(conn: Connection, shift_id: str) -> list[str]:
+    return conn.execute(f"""
+                    select receipt_id from shift_receipt_linker 
+                    where shift_id='{shift_id}';
+                """).fetchall()
+
+
 def test_env_works(conn: Connection) -> None:
     ShiftSqlLiteRepository(conn, ReceiptSqlLiteRepository(conn))
     insert_shift(conn, Shift("1", ShiftState.OPEN, []))
@@ -62,4 +69,12 @@ def test_should_change_shift_status(conn: Connection) -> None:
     insert_shift(conn, Shift("1", ShiftState.OPEN, []))
     repo.close("1")
     assert get_shift_status(conn, "1") == str(ShiftState.CLOSED)
+    conn.close()
+
+
+def test_should_add_new_shift(conn: Connection) -> None:
+    repo = ShiftSqlLiteRepository(conn, ReceiptSqlLiteRepository(conn))
+    repo.store(Shift("1", ShiftState.OPEN, []))
+    assert get_shift_status(conn, "1") == str(ShiftState.OPEN)
+    assert get_shift_receipts(conn, "1") == []
     conn.close()
