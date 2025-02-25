@@ -43,13 +43,12 @@ class ReceiptService:
         pass
 
     def delete(self, receipt_id: str, shift_service: IShiftService) -> None:
-        if not self.receiptRepo.contains_receipt(receipt_id):
+        receipt = self.receiptRepo.get_receipt(receipt_id)
+        if receipt is None:
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
-        if self.receiptRepo.get_receipt(receipt_id).status == ReceiptStatus.CLOSED:
+        if receipt.status == ReceiptStatus.CLOSED:
             raise ValueError("Receipt is already Closed.")
-        shift_service.remove_receipt(
-            receipt_id, self.receiptRepo.get_receipt(receipt_id).shift_id
-        )
+        shift_service.remove_receipt(receipt_id, receipt.shift_id)
         self.receiptRepo.delete_receipt(receipt_id)
 
     def get(self, receipt_id: str) -> Receipt:

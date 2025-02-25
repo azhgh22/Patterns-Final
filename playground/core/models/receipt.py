@@ -12,7 +12,7 @@ class ReceiptItem:
     price: int
     total: int
 
-    def add_item(self, num_items: int):
+    def add_item(self, num_items: int) -> None:
         self.quantity += num_items
 
 
