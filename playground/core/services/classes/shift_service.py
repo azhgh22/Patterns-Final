@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
+from multiprocessing.managers import Value
 from uuid import uuid4
 
 from playground.core.enums.shift_state import ShiftState
@@ -61,14 +62,14 @@ class ShiftService:
 
         return XReport(shift_id, len(shift_receipts), products, revenue)
 
-    def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt | None:
+    def add_receipt(self, receipt: Receipt) -> Receipt | None:
         open_shift_id = self.get_open_shift_id()
-        if open_shift_id is None or open_shift_id != shift_id:
-            return None
+        if open_shift_id is None:
+            raise ValueError("Open shift to start working")
         if receipt.status == "close":
             return None
 
-        updated_receipt = self.repo.add_receipt(shift_id, receipt)
+        updated_receipt = self.repo.add_receipt(open_shift_id, receipt)
         return updated_receipt
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
