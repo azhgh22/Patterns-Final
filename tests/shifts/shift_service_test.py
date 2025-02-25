@@ -47,7 +47,7 @@ def test_add_receipt_to_closed_shift_should_fail() -> None:
     try:
         service.add_receipt(receipt)
         assert False
-    except IndexError:
+    except ValueError:
         assert True
 
 
