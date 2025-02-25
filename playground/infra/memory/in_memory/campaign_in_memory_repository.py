@@ -16,7 +16,7 @@ class CampaignInMemoryRepository:
                 raise ValueError("Campaign already exists")
         self.campaigns.append(campaign)
 
-    def get_by_id(self, campaign_id) -> Campaign:
+    def get_by_id(self, campaign_id: str) -> Campaign:
         for campaign in self.campaigns:
             if campaign.id == campaign_id:
                 return campaign
@@ -25,7 +25,7 @@ class CampaignInMemoryRepository:
     def get_all(self) -> List[Campaign]:
         return self.campaigns
 
-    def delete_campaign(self, campaign_id) -> None:
+    def delete_campaign(self, campaign_id: str) -> None:
         for campaign in self.campaigns:
             if campaign.id == campaign_id:
                 self.campaigns.remove(campaign)

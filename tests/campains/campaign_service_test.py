@@ -1,4 +1,5 @@
-from playground.core.models.campaign import Campaign, CampaignRequestWithType
+from playground.core.models.campaign import Campaign
+from playground.core.services.classes.campaign_classes import CampaignRequestWithType
 from playground.core.services.classes.campaign_service import CampaignService
 from playground.infra.memory.in_memory.campaign_in_memory_repository import (
     CampaignInMemoryRepository,
@@ -45,7 +46,7 @@ def test_get_all() -> None:
     assert len(res) == 1
 
 
-def test_delete_by_id():
+def test_delete_by_id() -> None:
     service = CampaignService(CampaignInMemoryRepository())
     try:
         service.delete("1")
@@ -65,7 +66,9 @@ def test_delete_by_id():
 
 def test_get_campaign_request_with_type_instance_discount() -> None:
     service = CampaignService(CampaignInMemoryRepository())
-    res = service.get_campaign_request_with_type_instance("discount")
+    res = service.get_campaign_request_with_type_instance(
+        "discount", **{"applicable_product": "1", "discount_percentage": 50}
+    )
     assert res is not None
     assert res.type == "discount"
     assert res.params == {"applicable_product": "1", "discount_percentage": 50}
@@ -73,7 +76,9 @@ def test_get_campaign_request_with_type_instance_discount() -> None:
 
 def test_get_campaign_request_with_type_instance_combo() -> None:
     service = CampaignService(CampaignInMemoryRepository())
-    res = service.get_campaign_request_with_type_instance("combo")
+    res = service.get_campaign_request_with_type_instance(
+        "combo", **{"product_ids": [], "discount_percentage": 50}
+    )
     assert res is not None
     assert res.type == "combo"
     assert res.params == {"product_ids": [], "discount_percentage": 50}
@@ -81,7 +86,9 @@ def test_get_campaign_request_with_type_instance_combo() -> None:
 
 def test_get_campaign_request_with_type_instance_buy_n_get_n() -> None:
     service = CampaignService(CampaignInMemoryRepository())
-    res = service.get_campaign_request_with_type_instance("buy_n_get_n")
+    res = service.get_campaign_request_with_type_instance(
+        "buy_n_get_n", **{"product_id": "1", "required_quantity": 1}
+    )
     assert res is not None
     assert res.type == "buy_n_get_n"
     assert res.params == {"product_id": "1", "required_quantity": 1}

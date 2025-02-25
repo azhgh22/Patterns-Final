@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
-from playground.core.models.campaign import Campaign, CampaignRequestWithType
+from playground.core.models.campaign import Campaign
+from playground.core.services.classes.campaign_classes import CampaignRequestWithType
 from playground.core.services.classes.repository_in_memory_chooser import (
     InMemoryChooser,
 )
@@ -58,7 +59,7 @@ def test_should_return_not_empty_list() -> None:
 def test_should_add_campaign_buy_n_get_n() -> None:
     response = get_http().post(
         "/campaigns?campaign_type=buy_n_get_n",
-        json={"required_quantity": 2, "product_id": 123},
+        json={"required_quantity": 2, "product_id": "123"},
     )
     assert response.status_code == 200
     assert response.json().get("description")["type"] == "buy_n_get_n"
@@ -77,7 +78,7 @@ def test_should_add_campaign_combo() -> None:
 def test_should_add_campaign_discount() -> None:
     response = get_http().post(
         "/campaigns?campaign_type=discount",
-        json={"discount_percentage": 20, "applicable_product": 10},
+        json={"discount_percentage": 20, "applicable_product": "10"},
     )
 
     assert response.status_code == 200

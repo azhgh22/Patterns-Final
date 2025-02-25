@@ -1,7 +1,8 @@
 from typing import List, Any
 import sqlite3
 import json
-from playground.core.models.campaign import Campaign, CampaignRequestWithType
+from playground.core.models.campaign import Campaign
+from playground.core.services.classes.campaign_classes import CampaignRequestWithType
 
 
 class CampaignSQLRepository:

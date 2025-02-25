@@ -14,7 +14,6 @@ from playground.core.services.interfaces.service_interfaces.service_chooser_inte
 )
 from playground.infra.API.campaigns_api import campaigns_api
 from playground.infra.API.products_api import products_api
-from playground.infra.API.report_api import sales_api, x_reports_api
 
 
 @dataclass
@@ -25,8 +24,6 @@ class SetupConfiguration:
 
 def set_up_routes(api: FastAPI) -> None:
     api.include_router(products_api, prefix="/products", tags=["Products"])
-    api.include_router(sales_api, prefix="/sales", tags=["sales"])
-    api.include_router(x_reports_api, prefix="/x-reports", tags=["x_reports"])
     api.include_router(campaigns_api, prefix="/campaigns", tags=["campaigns"])
 
 

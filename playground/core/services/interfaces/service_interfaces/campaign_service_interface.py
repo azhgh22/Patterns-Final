@@ -1,11 +1,11 @@
+import typing
 from typing import Protocol, List
 
 from playground.core.models.campaign import (
     Campaign,
-    CampaignRequestInterface,
-    CampaignRequestWithType,
 )
 from playground.core.models.receipt import Receipt
+from playground.core.services.classes.campaign_classes import CampaignRequestWithType
 
 
 class ICampaignService(Protocol):
@@ -22,7 +22,7 @@ class ICampaignService(Protocol):
         pass
 
     def get_campaign_request_with_type_instance(
-        self, campaign_type: str, **kwargs
+        self, campaign_type: str, **kwargs: typing.Any
     ) -> CampaignRequestWithType:
         pass
 
