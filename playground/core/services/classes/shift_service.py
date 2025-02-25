@@ -42,7 +42,7 @@ class ShiftService:
     def get_x_report(
         self,
         shift_id: str,
-        payment_service: IPaymentService,
+        # payment_service: IPaymentService,
     ) -> XReport:
         items = defaultdict(int)
         sales = defaultdict(int)
@@ -53,8 +53,8 @@ class ShiftService:
             for item in receipt.products:
                 items[item.product_id] += item.total
 
-            payment = payment_service.get(receipt.id)
-            sales[payment.currency_id] += payment.amount
+            # payment = payment_service.get(receipt.id)
+            # sales[payment.currency_id] += payment.amount
 
         products = [ProductReport(product_id, amount) for product_id, amount in items.items()]
         revenue = [Revenue(currency_id, amount) for currency_id, amount in sales.items()]

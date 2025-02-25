@@ -18,7 +18,7 @@ class IShiftService(Protocol):
     def get_x_report(
         self,
         shift_id: str,
-        payment_service: IPaymentService,
+        # payment_service: IPaymentService,
     ) -> XReport:
         pass
 
