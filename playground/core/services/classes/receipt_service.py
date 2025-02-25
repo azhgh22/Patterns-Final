@@ -13,6 +13,9 @@ from playground.core.services.interfaces.memory.receipt_repository import (
 from playground.core.services.interfaces.service_interfaces.campaign_service_interface import (
     ICampaignService,
 )
+from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
+    IPaymentsService,
+)
 from playground.core.services.interfaces.service_interfaces.product_service_interface import (
     IProductService,
 )
@@ -39,7 +42,12 @@ class ReceiptService:
         self.receiptRepo.store_receipt(new_receipt)
         return new_receipt
 
-    def close(self, campaign_service: ICampaignService, shift_service: IShiftService) -> Receipt:
+    def close(
+        self,
+        campaign_service: ICampaignService,
+        shift_service: IShiftService,
+        payment_service: IPaymentsService,
+    ) -> Receipt:
         pass
 
     def delete(self, receipt_id: str, shift_service: IShiftService) -> None:

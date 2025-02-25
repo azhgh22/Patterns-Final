@@ -2,6 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from uuid import uuid4
 
+from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.product import ProductReport
 from playground.core.models.receipt import Receipt
@@ -33,8 +34,7 @@ class ShiftService:
             raise IndexError("open shift doesn't exist")
         receipts = self.repo.get_shift_receipts(shift_id)
         for receipt in receipts:
-            # TODO: change it to use enum
-            if receipt.status == "open":
+            if receipt.status == ReceiptStatus.OPEN:
                 return False
 
         return self.repo.close(shift_id)
@@ -72,7 +72,7 @@ class ShiftService:
         open_shift_id = self.get_open_shift_id()
         if open_shift_id is None:
             raise ValueError("open shift to start working")
-        if receipt.status == "close":
+        if receipt.status == ReceiptStatus.CLOSED:
             raise ValueError("receipt is closed!!!")
 
         updated_receipt = self.repo.add_receipt(open_shift_id, receipt)

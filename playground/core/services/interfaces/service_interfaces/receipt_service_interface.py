@@ -4,6 +4,9 @@ from playground.core.models.receipt import AddProductRequest, Receipt, ReceiptRe
 from playground.core.services.interfaces.service_interfaces.campaign_service_interface import (
     ICampaignService,
 )
+from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
+    IPaymentsService,
+)
 from playground.core.services.interfaces.service_interfaces.product_service_interface import (
     IProductService,
 )
@@ -16,7 +19,12 @@ class IReceiptService(Protocol):
     def create(self, prod_req: ReceiptRequest, shift_service: IShiftService) -> Receipt:
         pass
 
-    def close(self, campaign_service: ICampaignService, shift_service: IShiftService) -> Receipt:
+    def close(
+        self,
+        campaign_service: ICampaignService,
+        shift_service: IShiftService,
+        payment_service: IPaymentsService,
+    ) -> Receipt:
         pass
 
     def delete(self, receipt_id: str, shift_service: IShiftService) -> None:

@@ -22,6 +22,6 @@ class ReceiptSqlLiteRepository:
         pass
 
     def add_product_to_receipt(
-        self, receipt_id: str, product: Product, quantity: int
-    ) -> Receipt | None:
+        self, receipt: Receipt, product: Product, quantity: int
+    ) -> Receipt:
         pass

@@ -42,13 +42,16 @@ class ShiftSqlLiteRepository:
         )
         self.conn.commit()
 
-    def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt | None:
+    def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt:
         pass
 
     def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
         pass
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
+        pass
+
+    def shift_exists(self, shift_id: str) -> bool:
         pass
 
     def __create_shift_table(self) -> None:

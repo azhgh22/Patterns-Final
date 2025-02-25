@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.payments import Payment
 from playground.core.models.product import ProductReport
@@ -48,7 +49,12 @@ def test_two_open_should_fail() -> None:
 
 def test_should_get_stored_shift() -> None:
     receipt = Receipt(
-        "1", "1", "open", [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)], 20, 10
+        "1",
+        "1",
+        ReceiptStatus.OPEN,
+        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        20,
+        10,
     )
     shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
@@ -59,7 +65,7 @@ def test_should_get_stored_shift() -> None:
 def test_add_receipt_to_closed_shift_should_fail() -> None:
     shift_list = [Shift("1", ShiftState.CLOSED, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
-    receipt = Receipt("1", "", "open", [], 20, 10)
+    receipt = Receipt("1", "", ReceiptStatus.OPEN, [], 20, 10)
     try:
         service.add_receipt(receipt)
         assert False
@@ -71,7 +77,7 @@ def test_add_incorrect_receipt_to_shift_should_fail() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     try:
-        service.add_receipt(Receipt("1", "", "close", [], 20, 10))
+        service.add_receipt(Receipt("1", "", ReceiptStatus.CLOSED, [], 20, 10))
         assert False
     except ValueError:
         assert True
@@ -80,7 +86,7 @@ def test_add_incorrect_receipt_to_shift_should_fail() -> None:
 def test_add_receipt_to_shift() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
-    receipt = Receipt("1", "", "open", [], 20, 10)
+    receipt = Receipt("1", "", ReceiptStatus.OPEN, [], 20, 10)
     updated_receipt = service.add_receipt(receipt)
     assert updated_receipt is not None
     assert updated_receipt.shift_id == "1"
@@ -88,7 +94,12 @@ def test_add_receipt_to_shift() -> None:
 
 def test_remove_receipt_from_closed_shift_should_fail() -> None:
     receipt = Receipt(
-        "1", "1", "closed", [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)], 20, 10
+        "1",
+        "1",
+        ReceiptStatus.CLOSED,
+        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        20,
+        10,
     )
     shift_list = [Shift("1", ShiftState.CLOSED, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
@@ -101,7 +112,12 @@ def test_remove_receipt_from_closed_shift_should_fail() -> None:
 
 def test_remove_receipt_from_shift() -> None:
     receipt = Receipt(
-        "1", "1", "open", [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)], 20, 10
+        "1",
+        "1",
+        ReceiptStatus.OPEN,
+        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        20,
+        10,
     )
     shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
@@ -120,7 +136,12 @@ def test_close_incorrect_shift_should_fail() -> None:
 
 def test_close_shift_with_open_receipt_should_fail() -> None:
     receipt = Receipt(
-        "1", "1", "open", [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)], 20, 10
+        "1",
+        "1",
+        ReceiptStatus.OPEN,
+        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        20,
+        10,
     )
     shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
@@ -135,7 +156,7 @@ def test_close_shift() -> None:
 
 def test_x_report() -> None:
     x_report = XReport("1", 1, [ProductReport("1", 2)], [Revenue("GEL", 10)])
-    receipt = Receipt("1", "1", "closed", [ReceiptItem("1", 2, 5, 10)], 10, 10)
+    receipt = Receipt("1", "1", ReceiptStatus.CLOSED, [ReceiptItem("1", 2, 5, 10)], 10, 10)
     shift_list = [Shift("1", ShiftState.CLOSED, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
 

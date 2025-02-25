@@ -27,9 +27,7 @@ class CampaignInterface(ABC):
 
     @classmethod
     @abstractmethod
-    def create(
-        cls, **kwargs: Any
-    ) -> "CampaignInterface":  # Return type is CampaignInterface
+    def create(cls, **kwargs: Any) -> "CampaignInterface":  # Return type is CampaignInterface
         pass
 
     @abstractmethod
@@ -44,7 +42,7 @@ class BuyNGetNCampaign(CampaignInterface):
 
     def apply(self, receipt: Receipt) -> Receipt:
         for item in receipt.products:
-            if item.id == self.product_id and item.quantity >= self.required_quantity:
+            if item.product_id == self.product_id and item.quantity >= self.required_quantity:
                 item.quantity += self.required_quantity
         return receipt
 
@@ -76,8 +74,8 @@ class DiscountCampaign(CampaignInterface):
 
     def apply(self, receipt: Receipt) -> Receipt:
         for item in receipt.products:
-            if item.id == self.applicable_product:
-                item.price *= 1 - self.discount_percentage / 100
+            if item.product_id == self.applicable_product:
+                item.price *= round(1 - self.discount_percentage / 100)
         return receipt
 
     def to_request(self) -> CampaignRequestWithType:
@@ -109,20 +107,18 @@ class ComboCampaign(CampaignInterface):
 
     def apply(self, receipt: Receipt) -> Receipt:
         if all(
-            any(item.id == pid for item in receipt.products) for pid in self.product_ids
+            any(item.product_id == pid for item in receipt.products) for pid in self.product_ids
         ):
             for item in receipt.products:
-                if item.id in self.product_ids:
-                    item.price *= 1 - self.discount_percentage / 100
+                if item.product_id in self.product_ids:
+                    item.price *= round(1 - self.discount_percentage / 100)
         return receipt
 
     @classmethod
     def create(cls, **kwargs: typing.Any) -> CampaignInterface:
         product_ids = kwargs.get("product_ids")
         discount_percentage = kwargs.get("discount_percentage")
-        if not isinstance(product_ids, list) or not all(
-            isinstance(p, str) for p in product_ids
-        ):
+        if not isinstance(product_ids, list) or not all(isinstance(p, str) for p in product_ids):
             raise TypeError("product_ids must be a list of strings")
         if not isinstance(discount_percentage, (int, float)):
             raise TypeError("discount_percentage must be a float")
