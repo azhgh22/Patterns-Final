@@ -25,10 +25,17 @@ class ShiftServiceMock(IShiftService):
     def get_open_shift_id(self) -> str | None:
         return self.open_shift.id
 
-    def add_receipt(self, shift_id: str, receipt: Receipt) -> bool:
-        if shift_id != self.open_shift.id or receipt is None:
-            return False
-        return True
+    def add_receipt(self, receipt: Receipt) -> Receipt:
+        if receipt is None:
+            assert ValueError("receipt does not exists")
+        return Receipt(
+            receipt.id,
+            self.open_shift.id,
+            receipt.status,
+            receipt.products,
+            receipt.total,
+            receipt.discounted_total,
+        )
 
 
 def test_env_works() -> None:
@@ -58,7 +65,7 @@ def test_should_not_delete_non_existing_receipt() -> None:
 
 
 def test_should_delete_existing_receipt() -> None:
-    rec_list = [Receipt("11", "open", [], 0, 0)]
+    rec_list = [Receipt("11", "", "open", [], 0, None)]
     service = ReceiptService(ReceiptInMemoryRepository(rec_list))
     assert not service.delete("11", ShiftServiceMock())  # if there is no assertions its good
     assert len(rec_list) == 0
@@ -74,7 +81,7 @@ def test_should_not_get_non_existing_receipt() -> None:
 
 
 def test_should_get_existing_receipt() -> None:
-    service = ReceiptService(ReceiptInMemoryRepository([Receipt("11", "open", [], 0, 0)]))
+    service = ReceiptService(ReceiptInMemoryRepository([Receipt("11", "", "open", [], 0, None)]))
 
     response = service.get("11")
     assert isinstance(response, Receipt)
@@ -84,7 +91,7 @@ def test_should_get_existing_receipt() -> None:
 def test_should_not_add_non_existing_product_to_receipt() -> None:
     product_service = ProductService()
     product_request = AddProductRequest("1", 1)
-    receipt = Receipt("11", "open", [], 0, 0)
+    receipt = Receipt("11", "", "open", [], 0, None)
     receipt_service = ReceiptService(ReceiptInMemoryRepository([receipt]))
 
     try:
@@ -110,7 +117,7 @@ def test_should_add_product_to_receipt() -> None:
         ProductInMemoryRepository([Product("1", "vashli", "111", 2)])
     )
     product_request = AddProductRequest("1", 1)
-    receipt = Receipt("11", "open", [], 0, 0)
+    receipt = Receipt("11", "", "open", [], 0, None)
     receipt_service = ReceiptService(ReceiptInMemoryRepository([receipt]))
     response = receipt_service.add_product("11", product_request, product_service)
     assert isinstance(response, Receipt)
@@ -125,7 +132,7 @@ def test_should_not_add_product_to_not_opened_receipt() -> None:
     )
     product_request = AddProductRequest("1", 1)
     receipt_service = ReceiptService(
-        ReceiptInMemoryRepository([Receipt("11", "closed", [], 0, 0)])
+        ReceiptInMemoryRepository([Receipt("11", "", "closed", [], 0, None)])
     )
     try:
         receipt_service.add_product("11", product_request, product_service)

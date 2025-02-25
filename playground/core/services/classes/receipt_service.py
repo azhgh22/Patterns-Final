@@ -30,14 +30,9 @@ class ReceiptService:
     def create(self, prod_req: ReceiptRequest, shift_service: IShiftService) -> Receipt:
         if prod_req.status != "open":
             raise ValueError("Receipt status should be open.")
-        open_shift_id = shift_service.get_open_shift_id()
-        if open_shift_id is None:
-            raise ValueError("There Are No Open Shifts to Create Receipt.")
 
         receipt_id = str(uuid4())
-        new_receipt = Receipt(receipt_id, "open", [], 0, None)
-        self.receiptRepo.store_receipt(new_receipt)
-        shift_service.add_receipt(open_shift_id, new_receipt)
+        new_receipt = shift_service.add_receipt(Receipt(receipt_id, "", "open", [], 0, None))
         return new_receipt
 
     def close(self, campaign_service: ICampaignService, shift_service: IShiftService) -> Receipt:
