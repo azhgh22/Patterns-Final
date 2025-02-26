@@ -1,4 +1,6 @@
+from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.models.campaign import Campaign
+from playground.core.models.receipt import Receipt, ReceiptItem
 from playground.core.services.classes.campaign_classes import CampaignRequestWithType
 from playground.core.services.classes.campaign_service import CampaignService
 from playground.infra.memory.in_memory.campaign_in_memory_repository import (
@@ -94,4 +96,141 @@ def test_get_campaign_request_with_type_instance_buy_n_get_n() -> None:
     assert res.params == {"product_id": "1", "required_quantity": 1}
 
 
-# todo: test apply ofter receipt is finished
+def test_apply_discount() -> None:
+    service = CampaignService(
+        CampaignInMemoryRepository(
+            [
+                Campaign(
+                    id="1",
+                    description=CampaignRequestWithType(
+                        type="discount",
+                        params={"applicable_product": "1", "discount_percentage": 50},
+                    ),
+                )
+            ]
+        )
+    )
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="1",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    product_id="2",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+            ],
+            total=100,
+            discounted_total=None,
+        )
+    )
+    assert res is not None
+    assert res.id == "1"
+    assert res.discounted_total == 150
+    assert res.products[0].price == 50
+
+
+def test_apply_buy_n_get_n() -> None:
+    service = CampaignService(
+        CampaignInMemoryRepository(
+            [
+                Campaign(
+                    id="1",
+                    description=CampaignRequestWithType(
+                        type="buy_n_get_n",
+                        params={"product_id": "1", "required_quantity": 1},
+                    ),
+                )
+            ]
+        )
+    )
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="1",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    product_id="2",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+            ],
+            total=200,
+            discounted_total=None,
+        )
+    )
+    assert res is not None
+    assert res.id == "1"
+    assert res.discounted_total == 200
+    assert res.products[0].price == 100
+    assert res.products[0].quantity == 2
+
+
+def test_apply_combo() -> None:
+    service = CampaignService(
+        CampaignInMemoryRepository(
+            [
+                Campaign(
+                    id="1",
+                    description=CampaignRequestWithType(
+                        type="combo",
+                        params={"product_ids": ["1", "2"], "discount_percentage": 50},
+                    ),
+                )
+            ]
+        )
+    )
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="1",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    product_id="2",
+                    quantity=2,
+                    price=10,
+                    total=10,
+                ),
+                ReceiptItem(
+                    product_id="3",
+                    quantity=3,
+                    price=10,
+                    total=10,
+                ),
+            ],
+            total=120,
+            discounted_total=None,
+        )
+    )
+    assert res is not None
+    assert res.id == "1"
+    assert res.products[0].price == 50
+    assert res.products[0].quantity == 1
+    assert res.products[1].price == 5
+    assert res.products[1].quantity == 2
+
+    assert res.discounted_total == 65

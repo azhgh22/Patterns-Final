@@ -79,8 +79,9 @@ class DiscountCampaign(CampaignInterface):
         applied = False
         for item in receipt.products:
             if item.product_id == self.applicable_product:
-                item.price *= round(1 - self.discount_percentage / 100)
-                new_total += item.price
+                item.price = round(item.price * (1 - self.discount_percentage / 100))
+                applied = True
+            new_total += item.price
         if applied:
             receipt.discounted_total = new_total
         return receipt
@@ -120,8 +121,8 @@ class ComboCampaign(CampaignInterface):
             new_total = 0
             for item in receipt.products:
                 if item.product_id in self.product_ids:
-                    item.price *= round(1 - self.discount_percentage / 100)
-                    new_total += item.price
+                    item.price = round(item.price * (1 - self.discount_percentage / 100))
+                new_total += item.price
             receipt.discounted_total = new_total
         return receipt
 
