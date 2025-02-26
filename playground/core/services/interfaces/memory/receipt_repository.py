@@ -23,5 +23,5 @@ class ReceiptRepository(Protocol):
     ) -> Receipt:
         pass
 
-    def close_receipt(self, updated_receipt) -> None:
+    def close_receipt(self, updated_receipt: Receipt) -> None:
         pass

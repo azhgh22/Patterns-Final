@@ -50,5 +50,7 @@ class ReceiptInMemoryRepository:
         receipt.total += product.price * quantity
         return receipt
 
-    def close_receipt(self, updated_receipt) -> None:
-        pass
+    def close_receipt(self, updated_receipt: Receipt) -> None:
+        for r in self.receipt_list:
+            if r.id == updated_receipt.id:
+                r = updated_receipt
