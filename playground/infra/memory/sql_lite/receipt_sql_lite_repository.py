@@ -121,13 +121,47 @@ class ReceiptSqlLiteRepository:
         return receipt
 
     def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
-        pass
+        self.connection.execute(
+            "UPDATE receipts SET shift_id = ? WHERE id = ?", (shift_id, receipt_id)
+        )
+        self.connection.commit()
 
     def get_all_receipts(self, shift_id: str) -> list[Receipt]:
-        pass
+        cursor = self.connection.execute(
+            "SELECT id, shift_id, status, total, discounted_total FROM receipts "
+            "WHERE shift_id = ?",
+            (shift_id,),
+        )
+        receipts = []
+        for row in cursor.fetchall():
+            try:
+                status = ReceiptStatus[row[2]]
+            except KeyError:
+                status = row[2]
+            receipt = Receipt(
+                id=row[0],
+                shift_id=row[1],
+                status=status,
+                products=[],
+                total=row[3],
+                discounted_total=row[4],
+            )
+            items_cursor = self.connection.execute(
+                "SELECT product_id, quantity, price, total FROM receipt_items "
+                "WHERE receipt_id = ?",
+                (row[0],),
+            )
+            for item in items_cursor.fetchall():
+                receipt.products.append(ReceiptItem(item[0], item[1], item[2], item[3]))
+            receipts.append(receipt)
+        return receipts
 
     def clear_receipt_shift_id(self, receipt_id: str) -> bool:
-        pass
+        cursor = self.connection.execute(
+            "UPDATE receipts SET shift_id = '' WHERE id = ?", (receipt_id,)
+        )
+        self.connection.commit()
+        return cursor.rowcount > 0
 
     def close_receipt(self, updated_receipt: Receipt) -> None:
         self.connection.execute(
