@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
 
 from playground.core.services.classes.campaign_classes import (
     CampaignInterface,

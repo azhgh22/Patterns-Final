@@ -5,7 +5,6 @@ from sqlite3 import Connection
 import pytest
 
 from playground.core.enums.shift_state import ShiftState
-from playground.core.models.receipt import Receipt
 from playground.core.models.shift import Shift
 from playground.infra.memory.sql_lite.receipt_sql_lite_repository import ReceiptSqlLiteRepository
 from playground.infra.memory.sql_lite.shift_sql_lite_repository import ShiftSqlLiteRepository

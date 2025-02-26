@@ -1,7 +1,7 @@
 from typing import Protocol
 
-from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.core.services.interfaces.memory.campaign_repository import CampaignRepository
+from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
