@@ -2,12 +2,14 @@ from starlette.testclient import TestClient
 
 from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.enums.shift_state import ShiftState
+from playground.core.models.payments import Payment
 from playground.core.models.product import Product
 from playground.core.models.receipt import Receipt
 from playground.core.models.shift import Shift
 from playground.core.services.classes.repository_in_memory_chooser import (
     InMemoryChooser,
 )
+from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
@@ -15,6 +17,9 @@ from playground.core.services.interfaces.memory.receipt_repository import (
     ReceiptRepository,
 )
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
+from playground.infra.memory.in_memory.payment_in_memory_repository import (
+    PaymentInMemoryRepository,
+)
 from playground.infra.memory.in_memory.products_in_memory_repository import (
     ProductInMemoryRepository,
 )
@@ -29,13 +34,17 @@ def get_http(
     product_repo: ProductRepository = ProductInMemoryRepository(),
     receipt_repo: ReceiptRepository = ReceiptInMemoryRepository(),
     shift_repo: ShiftRepository = ShiftInMemoryRepository(),
+    payment_repo: PaymentRepository = PaymentInMemoryRepository(),
 ) -> TestClient:
     return TestClient(
         setup(
             SetupConfiguration(
                 repository_chooser=InMemoryChooser(
-                    product_repo=product_repo, receipt_repo=receipt_repo, shift_repo=shift_repo
-                )
+                    product_repo=product_repo,
+                    receipt_repo=receipt_repo,
+                    shift_repo=shift_repo,
+                    payment_repo=payment_repo,
+                ),
             )
         )
     )
@@ -116,3 +125,29 @@ def test_should_not_delete_closed_receipt() -> None:
     )
     assert response.status_code == 400
     assert "already Closed" in response.json()["detail"]
+
+
+def test_should_not_close_non_existing_receipt() -> None:
+    response = get_http().post("/receipts/11/close?currency_id=GEL", json={"receipt_id": "11"})
+    assert response.status_code == 400
+    assert "not found" in response.json()["detail"]
+
+
+def test_should_not_close_already_closed_receipt() -> None:
+    receipt = Receipt("11", "", ReceiptStatus.CLOSED, [], 0, None)
+    response = get_http(receipt_repo=ReceiptInMemoryRepository([receipt])).post(
+        "/receipts/11/close?currency_id=GEL", json={"receipt_id": "11"}
+    )
+    assert response.status_code == 400
+    assert "should not be closed" in response.json()["detail"]
+
+
+def test_should_close_receipt() -> None:
+    receipt = Receipt("11", "", ReceiptStatus.OPEN, [], 150, None)
+    payment_request = Payment("11", "GEL", 150)
+    response = get_http(
+        receipt_repo=ReceiptInMemoryRepository([receipt]),
+        payment_repo=PaymentInMemoryRepository([payment_request]),
+    ).post("/receipts/11/close?currency_id=GEL", json={"receipt_id": 11})
+    assert response.status_code == 200
+    assert receipt.status == ReceiptStatus.CLOSED

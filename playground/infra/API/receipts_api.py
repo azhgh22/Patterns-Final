@@ -17,6 +17,8 @@ from playground.core.services.interfaces.service_interfaces.service_chooser_inte
 from playground.core.services.interfaces.service_interfaces.shift_service_interface import (
     IShiftService,
 )
+from playground.infra.API.campaigns_api import get_campaign_service
+from playground.infra.API.payments_api import get_payment_service
 from playground.infra.API.products_api import get_product_service
 
 receipts_api = APIRouter()
@@ -64,5 +66,16 @@ def delete_receipt(request: Request, receipt_id: str) -> None:
     service = get_receipt_service(request)
     try:
         service.delete(receipt_id, get_shift_service(request))
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@receipts_api.post("/{receipt_id}/close", status_code=status.HTTP_200_OK)
+def close_receipt(request: Request, receipt_id: str, currency_id: str) -> None:
+    service = get_receipt_service(request)
+    try:
+        service.close(
+            receipt_id, currency_id, get_campaign_service(request), get_payment_service(request)
+        )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
