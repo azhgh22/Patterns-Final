@@ -43,10 +43,7 @@ class ShiftSqlLiteRepository:
 
     def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt:
         self.receipt_repo.update_shift_id(shift_id, receipt.id)
-        res = self.receipt_repo.get_receipt(receipt.id)
-        if res is None:
-            raise Exception("Failed to add receipt")
-        return res
+        return receipt
 
     def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
         return self.receipt_repo.get_all_receipts(shift_id)

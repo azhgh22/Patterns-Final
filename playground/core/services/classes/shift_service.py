@@ -70,7 +70,6 @@ class ShiftService:
 
     def add_receipt(self, receipt: Receipt) -> Receipt:
         open_shift_id = self.get_open_shift_id()
-        print("bla")
         if open_shift_id is None:
             raise ValueError("open shift to start working")
         if receipt.status == ReceiptStatus.CLOSED:

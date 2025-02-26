@@ -40,7 +40,6 @@ async def create_campaign(
 
 @campaigns_api.delete("/{campaign_id}")
 async def delete_campaign(request: Request, campaign_id: str) -> None:
-    print(campaign_id)
     try:
         get_campaign_service(request).delete(campaign_id)
     except ValueError as e:
