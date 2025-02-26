@@ -1,11 +1,10 @@
 import typing
 
-
 from playground.core.services.classes.campaign_classes import (
     BuyNGetNCampaign,
-    DiscountCampaign,
-    ComboCampaign,
     CampaignInterface,
+    ComboCampaign,
+    DiscountCampaign,
 )
 
 

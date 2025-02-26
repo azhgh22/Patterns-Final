@@ -8,12 +8,10 @@ from playground.core.services.classes.repository_in_memory_chooser import (
 from playground.core.services.interfaces.memory.campaign_repository import (
     CampaignRepository,
 )
-
 from playground.infra.memory.in_memory.campaign_in_memory_repository import (
     CampaignInMemoryRepository,
 )
-
-from playground.runner.setup import setup, SetupConfiguration
+from playground.runner.setup import SetupConfiguration, setup
 
 
 def get_http(

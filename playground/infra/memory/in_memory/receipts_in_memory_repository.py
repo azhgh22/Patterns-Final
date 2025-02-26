@@ -1,6 +1,5 @@
 from typing import List
 
-from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.models.product import Product
 from playground.core.models.receipt import (
     Receipt,
@@ -51,7 +50,9 @@ class ReceiptInMemoryRepository:
         return receipt
 
     def close_receipt(self, updated_receipt: Receipt) -> None:
-        pass
+        for r in self.receipt_list:
+            if r.id == updated_receipt.id:
+                r = updated_receipt
 
     def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
         for receipt in self.receipt_list:

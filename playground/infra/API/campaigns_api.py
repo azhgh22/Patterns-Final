@@ -1,6 +1,6 @@
-from typing import List, Dict, Any
-from fastapi import HTTPException
-from fastapi import APIRouter
+from typing import Any, Dict, List
+
+from fastapi import APIRouter, HTTPException
 from starlette.requests import Request
 
 from playground.core.models.campaign import Campaign

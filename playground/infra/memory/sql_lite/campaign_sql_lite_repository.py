@@ -1,6 +1,7 @@
-from typing import List, Any
-import sqlite3
 import json
+import sqlite3
+from typing import List
+
 from playground.core.models.campaign import Campaign
 from playground.core.services.classes.campaign_classes import CampaignRequestWithType
 

@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_200_OK, HTTP_201_CREATED
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.shift import Shift
@@ -7,7 +7,7 @@ from playground.core.models.x_report import XReport
 from playground.core.services.classes.repository_in_memory_chooser import InMemoryChooser
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
 from playground.infra.memory.in_memory.shift_in_memory_repository import ShiftInMemoryRepository
-from playground.runner.setup import setup, SetupConfiguration
+from playground.runner.setup import SetupConfiguration, setup
 
 
 def get_http(

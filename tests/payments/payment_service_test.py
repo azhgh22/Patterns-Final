@@ -1,5 +1,4 @@
 from playground.core.models.payments import Payment
-from playground.core.models.receipt import Receipt
 from playground.core.services.classes.payment_service import PaymentService
 from playground.infra.memory.in_memory.payment_in_memory_repository import (
     PaymentInMemoryRepository,

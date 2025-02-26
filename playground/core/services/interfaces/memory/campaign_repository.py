@@ -1,7 +1,6 @@
-from typing import Protocol, List
+from typing import List, Protocol
 
 from playground.core.models.campaign import Campaign
-from playground.core.models.receipt import Receipt
 
 
 class CampaignRepository(Protocol):

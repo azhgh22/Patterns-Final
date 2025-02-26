@@ -9,11 +9,11 @@ from playground.core.services.classes.campaign_classes import CampaignRequestWit
 from playground.core.services.classes.campaign_factory import (
     CampaignFactory,
 )
-from playground.infra.memory.in_memory.campaign_in_memory_repository import (
-    CampaignInMemoryRepository,
-)
 from playground.core.services.interfaces.memory.campaign_repository import (
     CampaignRepository,
+)
+from playground.infra.memory.in_memory.campaign_in_memory_repository import (
+    CampaignInMemoryRepository,
 )
 
 

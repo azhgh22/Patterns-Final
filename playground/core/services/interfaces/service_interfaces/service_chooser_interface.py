@@ -5,13 +5,13 @@ from playground.core.services.interfaces.memory.payment_repository import Paymen
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
-from playground.core.services.interfaces.service_interfaces.campaign_service_interface import (
-    ICampaignService,
-)
 from playground.core.services.interfaces.memory.receipt_repository import (
     ReceiptRepository,
 )
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
+from playground.core.services.interfaces.service_interfaces.campaign_service_interface import (
+    ICampaignService,
+)
 from playground.core.services.interfaces.service_interfaces.payments_service_interface import (
     IPaymentsService,
 )

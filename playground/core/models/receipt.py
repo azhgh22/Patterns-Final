@@ -14,6 +14,7 @@ class ReceiptItem:
 
     def add_item(self, num_items: int) -> None:
         self.quantity += num_items
+        self.total += self.price * num_items
 
 
 @dataclass
