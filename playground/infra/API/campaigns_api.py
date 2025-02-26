@@ -1,6 +1,6 @@
-from typing import List, Dict, Any
-from fastapi import HTTPException
-from fastapi import APIRouter
+from typing import Any, Dict, List
+
+from fastapi import APIRouter, HTTPException
 from starlette.requests import Request
 
 from playground.core.models.campaign import Campaign
@@ -40,7 +40,6 @@ async def create_campaign(
 
 @campaigns_api.delete("/{campaign_id}")
 async def delete_campaign(request: Request, campaign_id: str) -> None:
-    print(campaign_id)
     try:
         get_campaign_service(request).delete(campaign_id)
     except ValueError as e:

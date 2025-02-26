@@ -1,5 +1,5 @@
 import typing
-from typing import Protocol, List
+from typing import List, Protocol
 
 from playground.core.models.campaign import (
     Campaign,

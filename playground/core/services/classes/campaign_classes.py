@@ -1,23 +1,17 @@
 from __future__ import annotations
 
 import typing
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any, List
 
 from playground.core.models.receipt import Receipt
-
-
-from abc import ABC, abstractmethod
-from typing import List
 
 
 @dataclass
 class CampaignRequestWithType:
     type: str
     params: dict[str, typing.Any]
-
-
-from abc import ABC, abstractmethod
-from typing import Any
 
 
 class CampaignInterface(ABC):

@@ -1,11 +1,10 @@
 import typing
 
-
 from playground.core.services.classes.campaign_classes import (
     BuyNGetNCampaign,
-    DiscountCampaign,
-    ComboCampaign,
     CampaignInterface,
+    ComboCampaign,
+    DiscountCampaign,
 )
 
 
@@ -21,7 +20,7 @@ class CampaignFactory:
         campaign_class = CampaignFactory.CAMPAIGN_TYPES.get(campaign_type)
         if not campaign_class:
             raise ValueError(f"Invalid campaign type: {campaign_type}")
-        obj = campaign_class.create(**kwargs)
+        obj = campaign_class(**kwargs)
         if not isinstance(obj, CampaignInterface):
             raise ValueError("Invalid campaign type")
         return obj

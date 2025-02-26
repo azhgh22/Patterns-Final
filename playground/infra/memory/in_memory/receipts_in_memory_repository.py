@@ -1,6 +1,5 @@
 from typing import List
 
-from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.models.product import Product
 from playground.core.models.receipt import (
     Receipt,
@@ -50,5 +49,26 @@ class ReceiptInMemoryRepository:
         receipt.total += product.price * quantity
         return receipt
 
-    def close_receipt(self, updated_receipt) -> None:
-        pass
+    def close_receipt(self, updated_receipt: Receipt) -> None:
+        for r in self.receipt_list:
+            if r.id == updated_receipt.id:
+                r = updated_receipt
+
+    def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
+        for receipt in self.receipt_list:
+            if receipt.id == receipt_id:
+                receipt.shift_id = shift_id
+
+    def get_all_receipts(self, shift_id: str) -> list[Receipt]:
+        new_list: list[Receipt] = []
+        for receipt in self.receipt_list:
+            if receipt.shift_id == shift_id:
+                new_list.append(receipt)
+        return new_list
+
+    def clear_receipt_shift_id(self, receipt_id: str) -> bool:
+        receipt = self.get_receipt(receipt_id)
+        if receipt is None:
+            return False
+        receipt.shift_id = ""
+        return True

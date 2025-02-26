@@ -1,7 +1,6 @@
 from typing import List
 
 from playground.core.models.campaign import Campaign
-from playground.core.models.receipt import Receipt
 
 
 class CampaignInMemoryRepository:

@@ -11,7 +11,6 @@ class ShiftSqlLiteRepository:
         self.conn = connection
         self.receipt_repo = receipt_repo
         self.__create_shift_table()
-        self.__create_shift_receipt_linker()
 
     def get_open_shift_id(self) -> str | None:
         res = self.conn.execute(f"""
@@ -20,7 +19,7 @@ class ShiftSqlLiteRepository:
         """).fetchone()
 
         if res is not None:
-            return res[0]
+            return str(res[0])
         return None
 
     def close(self, shift_id: str) -> bool:
@@ -43,16 +42,22 @@ class ShiftSqlLiteRepository:
         self.conn.commit()
 
     def add_receipt(self, shift_id: str, receipt: Receipt) -> Receipt:
-        pass
+        self.receipt_repo.update_shift_id(shift_id, receipt.id)
+        return receipt
 
     def get_shift_receipts(self, shift_id: str) -> list[Receipt]:
-        pass
+        return self.receipt_repo.get_all_receipts(shift_id)
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
-        pass
+        return self.receipt_repo.clear_receipt_shift_id(receipt_id)
 
     def shift_exists(self, shift_id: str) -> bool:
-        pass
+        res = self.conn.execute(f"""
+            select * from shifts
+            where id = '{shift_id}'
+        """).fetchone()
+
+        return res is not None
 
     def __create_shift_table(self) -> None:
         self.conn.execute("""
@@ -61,15 +66,5 @@ class ShiftSqlLiteRepository:
                                         status Text
                                     )
                                 """)
-
-        self.conn.commit()
-
-    def __create_shift_receipt_linker(self) -> None:
-        self.conn.execute("""
-                    create table if not exists shift_receipt_linker(
-                            shift_id Text,
-                            receipt_id Text       
-                        )
-                """)
 
         self.conn.commit()
