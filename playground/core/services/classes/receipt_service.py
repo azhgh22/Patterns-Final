@@ -30,7 +30,7 @@ from playground.infra.memory.in_memory.receipts_in_memory_repository import (
 
 @dataclass
 class ReceiptService:
-    receiptRepo: ReceiptRepository = ReceiptInMemoryRepository()
+    receipt_repo: ReceiptRepository = ReceiptInMemoryRepository()
 
     def create(self, prod_req: ReceiptRequest, shift_service: IShiftService) -> Receipt:
         if prod_req.status != "open":
@@ -40,7 +40,7 @@ class ReceiptService:
         new_receipt = shift_service.add_receipt(
             Receipt(receipt_id, "", ReceiptStatus.OPEN, [], 0, None)
         )
-        self.receiptRepo.store_receipt(new_receipt)
+        self.receipt_repo.store_receipt(new_receipt)
         return new_receipt
 
     def close(
@@ -50,7 +50,7 @@ class ReceiptService:
         campaign_service: ICampaignService,
         payment_service: IPaymentsService,
     ) -> Receipt:
-        receipt = self.receiptRepo.get_receipt(receipt_id)
+        receipt = self.receipt_repo.get_receipt(receipt_id)
         if receipt is None:
             raise ValueError(f"Receipt with id {receipt_id} not found.")
         if receipt.status == ReceiptStatus.CLOSED:
@@ -64,20 +64,20 @@ class ReceiptService:
         payment = Payment(receipt_id, currency_id, total)
         payment_service.register_payment(payment)
         updated_receipt.status = ReceiptStatus.CLOSED
-        self.receiptRepo.close_receipt(updated_receipt)
+        self.receipt_repo.close_receipt(updated_receipt)
         return updated_receipt
 
     def delete(self, receipt_id: str, shift_service: IShiftService) -> None:
-        receipt = self.receiptRepo.get_receipt(receipt_id)
+        receipt = self.receipt_repo.get_receipt(receipt_id)
         if receipt is None:
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         if receipt.status == ReceiptStatus.CLOSED:
             raise ValueError("Receipt is already Closed.")
         shift_service.remove_receipt(receipt_id, receipt.shift_id)
-        self.receiptRepo.delete_receipt(receipt_id)
+        self.receipt_repo.delete_receipt(receipt_id)
 
     def get(self, receipt_id: str) -> Receipt:
-        receipt = self.receiptRepo.get_receipt(receipt_id)
+        receipt = self.receipt_repo.get_receipt(receipt_id)
         if receipt is None:
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         return receipt
@@ -89,13 +89,13 @@ class ReceiptService:
         product_service: IProductService,
     ) -> Receipt:
         product = product_service.get_product(product_request.id)
-        receipt = self.receiptRepo.get_receipt(receipt_id)
+        receipt = self.receipt_repo.get_receipt(receipt_id)
         if product is None:
             raise ValueError(f"Product with id {product_request.id} does not exist.")
         elif receipt is None:
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         elif receipt.status != ReceiptStatus.OPEN:
             raise ValueError("Receipt status should be open.")
-        return self.receiptRepo.add_product_to_receipt(
+        return self.receipt_repo.add_product_to_receipt(
             receipt, product, product_request.quantity
         )

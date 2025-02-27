@@ -76,6 +76,8 @@ class ShiftService:
             raise ValueError("receipt is closed!!!")
 
         updated_receipt = self.repo.add_receipt(open_shift_id, receipt)
+        updated_receipt.shift_id = open_shift_id
+
         return updated_receipt
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:

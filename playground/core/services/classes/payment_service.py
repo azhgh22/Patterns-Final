@@ -18,7 +18,6 @@ class PaymentService:
         converted_total = self.converter.convert("GEL", currency_id, amount)
         return int(round(converted_total))
 
-    # TODO: receipt should get closed after registering payment
     def register_payment(
         self,
         payment_request: Payment,
