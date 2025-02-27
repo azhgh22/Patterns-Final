@@ -18,3 +18,6 @@ class PaymentInMemoryRepository:
             if payment.receipt_id == receipt_id:
                 return deepcopy(payment)
         return None
+
+    def get_all_payments(self) -> list[Payment]:
+        return self.payment_list

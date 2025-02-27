@@ -9,3 +9,6 @@ class PaymentRepository(Protocol):
 
     def get_payment(self, receipt_id: str) -> Payment | None:
         pass
+
+    def get_all_payments(self) -> list[Payment]:
+        pass

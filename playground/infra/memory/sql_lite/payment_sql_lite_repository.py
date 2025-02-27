@@ -37,3 +37,12 @@ class PaymentSqlLiteRepository:
                 amount=row[2],
             )
         return None
+
+    def get_all_payments(self) -> list[Payment]:
+        row = self.conn.execute(
+            "SELECT receipt_id, currency_id, amount FROM payments",
+        ).fetchall()
+        payment_list: list[Payment] = []
+        for r in row:
+            payment_list.append(Payment(r[0], r[1], r[2]))
+        return payment_list

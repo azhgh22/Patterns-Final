@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
+from playground.core.models import sales
 from playground.core.models.payments import Payment
+from playground.core.models.sales import SalesItem
 from playground.core.services.interfaces.currency_converter_interface import ICurrencyConverter
 from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.infra.currency_converter.er_api_converter import ErApiConverter
@@ -38,3 +40,16 @@ class PaymentService:
         if payment is None:
             raise ValueError(f"Payment with receipt_id {receipt_id} does not exist.")
         return payment
+
+    def get_sales(self) -> list[SalesItem]:
+        payment_list = self.repo.get_all_payments()
+        sales_list: list[SalesItem] = []
+        sale_dict: dict[str, int] = {}
+        for payment in payment_list:
+            if sale_dict.get(payment.receipt_id) is None:
+                sale_dict[payment.receipt_id] = len(sales_list)
+                sales_list.append(SalesItem(payment.currency_id, 0))
+
+            sales_list[sale_dict[payment.receipt_id]].total_price += payment.amount
+
+        return sales_list

@@ -55,3 +55,40 @@ def test_should_add_new_payment() -> None:
     assert payment_service.register_payment(Payment("1", "USD", 10))
     assert len(payment_list) == 1
     assert payment_list[0] == Payment("1", "USD", 20)
+
+
+def test_should_return_empty_sales_list() -> None:
+    service = PaymentService(repo=PaymentInMemoryRepository([]))
+    assert service.get_sales() == []
+
+
+def test_should_return_sales_broken_by_id() -> None:
+    payment_list = [
+        Payment(
+            "1",
+            "USD",
+            50,
+        ),
+        Payment(
+            "2",
+            "GEL",
+            50,
+        ),
+        Payment(
+            "2",
+            "GEL",
+            50,
+        ),
+    ]
+    service = PaymentService(PaymentInMemoryRepository(payment_list))
+    sales_list = service.get_sales()
+    assert len(sales_list) == 2
+    if sales_list[0].currency_id == "GEL":
+        assert sales_list[0].total_price == 100
+        assert sales_list[1].total_price == 50
+        assert sales_list[1].currency_id == "USD"
+    else:
+        assert sales_list[0].currency_id == "USD"
+        assert sales_list[0].total_price == 50
+        assert sales_list[1].total_price == 100
+        assert sales_list[1].currency_id == "GEL"

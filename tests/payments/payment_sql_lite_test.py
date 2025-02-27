@@ -59,3 +59,11 @@ def test_should_return_existing_payments(conn: Connection) -> None:
     insert_payment(conn)
     assert repo.get_payment("my_receipt") == Payment("my_receipt", "GEL", 10)
     conn.close()
+
+
+def test_should_return_payments_list(conn: Connection) -> None:
+    repo = PaymentSqlLiteRepository(conn)
+    insert_payment(conn)
+    payment_list = repo.get_all_payments()
+    assert len(payment_list) == 1
+    assert payment_list[0] == Payment("my_receipt", "GEL", 10)
