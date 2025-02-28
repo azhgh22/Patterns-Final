@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-from playground.core.models import sales
 from playground.core.models.payments import Payment
 from playground.core.models.sales import SalesItem
 from playground.core.services.interfaces.currency_converter_interface import ICurrencyConverter

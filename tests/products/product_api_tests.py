@@ -17,11 +17,7 @@ def get_http(
     product_repo: ProductRepository = ProductInMemoryRepository(),
 ) -> TestClient:
     return TestClient(
-        setup(
-            SetupConfiguration(
-                repository_chooser=InMemoryChooser(product_repo=product_repo)
-            )
-        )
+        setup(SetupConfiguration(repository_chooser=InMemoryChooser(product_repo=product_repo)))
     )
 
 

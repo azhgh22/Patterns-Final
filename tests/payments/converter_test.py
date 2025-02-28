@@ -5,5 +5,5 @@ def test_should_convert_gel_to_usd() -> None:
     converter = ErApiConverter()
     try:
         converter.convert("yle", "GEL", 100)
-    except ValueError as e:
+    except ValueError:
         assert False

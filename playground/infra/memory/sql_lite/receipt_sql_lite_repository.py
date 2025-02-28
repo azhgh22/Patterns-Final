@@ -176,7 +176,8 @@ class ReceiptSqlLiteRepository:
 
         for item in updated_receipt.products:
             self.connection.execute(
-                "UPDATE receipt_items SET quantity = ?, total = ? WHERE product_id = ? and receipt_id = ?",
+                """UPDATE receipt_items SET quantity = ?, total = ? 
+                        WHERE product_id = ? and receipt_id = ?""",
                 (item.quantity, item.total, item.product_id, updated_receipt.id),
             )
         self.connection.commit()
