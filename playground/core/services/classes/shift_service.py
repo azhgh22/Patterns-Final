@@ -35,7 +35,7 @@ class ShiftService:
         receipts = self.repo.get_shift_receipts(shift_id)
         for receipt in receipts:
             if receipt.status == ReceiptStatus.OPEN:
-                return False
+                raise IndexError("there is open receipt in shift")
 
         return self.repo.close(shift_id)
 
@@ -55,11 +55,11 @@ class ShiftService:
         shift_receipts = self.repo.get_shift_receipts(shift_id)
 
         for receipt in shift_receipts:
-            for item in receipt.products:
-                items[item.product_id] += item.quantity
-
-            payment = payment_service.get(receipt.id)
-            sales[payment.currency_id] += payment.amount
+            if receipt.status == ReceiptStatus.CLOSED:
+                for item in receipt.products:
+                    items[item.product_id] += item.quantity
+                payment = payment_service.get(receipt.id)
+                sales[payment.currency_id] += payment.amount
 
         products = [
             ProductReport(product_id, quantity) for product_id, quantity in items.items()

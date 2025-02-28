@@ -145,7 +145,11 @@ def test_close_shift_with_open_receipt_should_fail() -> None:
     )
     shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
-    assert service.close("1") is False
+    try:
+        service.close("1")
+        assert False
+    except IndexError:
+        assert True
 
 
 def test_close_shift() -> None:
