@@ -71,11 +71,12 @@ def delete_receipt(request: Request, receipt_id: str) -> None:
 
 
 @receipts_api.post("/{receipt_id}/close", status_code=status.HTTP_200_OK)
-def close_receipt(request: Request, receipt_id: str, currency_id: str) -> None:
+def close_receipt(request: Request, receipt_id: str, currency_id: str) -> Receipt:
     service = get_receipt_service(request)
     try:
-        service.close(
+        res = service.close(
             receipt_id, currency_id, get_campaign_service(request), get_payment_service(request)
         )
+        return res
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

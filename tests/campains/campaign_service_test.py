@@ -136,7 +136,8 @@ def test_apply_discount() -> None:
     assert res is not None
     assert res.id == "1"
     assert res.discounted_total == 150
-    assert res.products[0].price == 50
+    assert res.products[0].price == 100
+    assert res.products[0].total == 50
 
 
 def test_apply_buy_n_get_n() -> None:
@@ -213,24 +214,24 @@ def test_apply_combo() -> None:
                     product_id="2",
                     quantity=2,
                     price=10,
-                    total=10,
+                    total=20,
                 ),
                 ReceiptItem(
                     product_id="3",
                     quantity=3,
                     price=10,
-                    total=10,
+                    total=30,
                 ),
             ],
-            total=120,
+            total=150,
             discounted_total=None,
         )
     )
     assert res is not None
     assert res.id == "1"
-    assert res.products[0].price == 50
+    assert res.products[0].price == 100
     assert res.products[0].quantity == 1
-    assert res.products[1].price == 5
+    assert res.products[1].total == 10
     assert res.products[1].quantity == 2
 
-    assert res.discounted_total == 65
+    assert res.discounted_total == 90
