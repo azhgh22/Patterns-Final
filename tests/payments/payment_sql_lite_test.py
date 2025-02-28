@@ -67,3 +67,4 @@ def test_should_return_payments_list(conn: Connection) -> None:
     payment_list = repo.get_all_payments()
     assert len(payment_list) == 1
     assert payment_list[0] == Payment("my_receipt", "GEL", 10)
+    conn.close()
