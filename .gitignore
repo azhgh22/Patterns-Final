@@ -1,6 +1,9 @@
 .venv
 .idea
 app.log
+_test_db
 *.pyc
 */__pycache__/*
 *.db
+__pycache__/
+*.py[cod]
