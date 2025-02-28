@@ -4,7 +4,6 @@ from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.shift import Shift
 from playground.core.models.x_report import XReport
-from playground.core.services.classes.repository_in_memory_chooser import InMemoryChooser
 from playground.core.services.interfaces.memory.shift_repository import ShiftRepository
 from playground.infra.memory.in_memory.shift_in_memory_repository import ShiftInMemoryRepository
 from playground.runner.setup import SetupConfiguration, setup
@@ -13,9 +12,7 @@ from playground.runner.setup import SetupConfiguration, setup
 def get_http(
     shift_repo: ShiftRepository = ShiftInMemoryRepository(),
 ) -> TestClient:
-    return TestClient(
-        setup(SetupConfiguration(repository_chooser=InMemoryChooser(shift_repo=shift_repo)))
-    )
+    return TestClient(setup(SetupConfiguration.for_testing(shift_repo=shift_repo)))
 
 
 def test_open_shift() -> None:

@@ -1,9 +1,6 @@
 from fastapi.testclient import TestClient
 
 from playground.core.models.product import Product
-from playground.core.services.classes.repository_in_memory_chooser import (
-    InMemoryChooser,
-)
 from playground.core.services.interfaces.memory.product_repository import (
     ProductRepository,
 )
