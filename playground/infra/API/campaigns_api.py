@@ -24,7 +24,7 @@ def get_campaign_service(request: Request) -> ICampaignService:
 
 
 @campaigns_api.get("")
-async def get_campaign(request: Request) -> List[Campaign]:
+async def get_campaigns(request: Request) -> List[Campaign]:
     return get_campaign_service(request).get_all()
 
 

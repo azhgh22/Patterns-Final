@@ -33,12 +33,19 @@ class ProductSqlLiteRepository:
         return self.__get_product('"1"', "1")
 
     def update_price(self, p_id: str, price: int) -> bool:
-        updated_rows = self.conn.execute(f"""
-                    update products
-                    set price={price}
-                    where id = '{p_id}';
-                """).rowcount
-        return updated_rows == 1
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            UPDATE products
+            SET price = ?
+            WHERE id = ?;
+        """,
+            (price, p_id),
+        )
+
+        self.conn.commit()
+
+        return cursor.rowcount == 1
 
     def store_product(self, product: Product) -> None:
         self.conn.execute(
