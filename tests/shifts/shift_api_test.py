@@ -45,6 +45,9 @@ def test_get_x_report_for_existing_shift() -> None:
     response = get_http(shift_repo).get("/shifts/x-report/1")
     assert response.status_code == HTTP_200_OK
     assert isinstance(XReport(**response.json()), XReport)
+    x_report = XReport(**response.json())
+    assert x_report.shift_id == "1"
+    assert x_report.num_receipts == 0
 
 
 def test_get_x_report_for_non_existent_shift() -> None:
