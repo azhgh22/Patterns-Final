@@ -2,9 +2,6 @@ from fastapi.testclient import TestClient
 
 from playground.core.models.campaign import Campaign
 from playground.core.services.classes.campaign_classes import CampaignRequestWithType
-from playground.core.services.classes.repository_in_memory_chooser import (
-    InMemoryChooser,
-)
 from playground.core.services.interfaces.memory.campaign_repository import (
     CampaignRepository,
 )
@@ -17,13 +14,7 @@ from playground.runner.setup import SetupConfiguration, setup
 def get_http(
     campaign_repo: CampaignRepository = CampaignInMemoryRepository(),
 ) -> TestClient:
-    return TestClient(
-        setup(
-            SetupConfiguration(
-                repository_chooser=InMemoryChooser(campaign_repo=campaign_repo)
-            )
-        )
-    )
+    return TestClient(setup(SetupConfiguration.for_testing(campaign_repo=campaign_repo)))
 
 
 def test_should_return_empty_list() -> None:
