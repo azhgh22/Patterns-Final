@@ -62,7 +62,7 @@ class BuyNGetNCampaign(CampaignInterface):
         return cls(required_quantity, product_id)
 
 
-class DiscountCampaign(CampaignInterface):
+class DiscountProductCampaign(CampaignInterface):
     def __init__(self, discount_percentage: float, applicable_product: str) -> None:
         self.applicable_product = applicable_product
         self.discount_percentage = discount_percentage
@@ -82,7 +82,7 @@ class DiscountCampaign(CampaignInterface):
 
     def to_request(self) -> CampaignRequestWithType:
         return CampaignRequestWithType(
-            type="discount",
+            type="discount_product",
             params={
                 "discount_percentage": self.discount_percentage,
                 "applicable_product": self.applicable_product,
@@ -98,6 +98,46 @@ class DiscountCampaign(CampaignInterface):
         if not isinstance(applicable_product, str):
             raise TypeError("product_id must be a str")
         return cls(discount_percentage, applicable_product)
+
+
+class DiscountReceiptCampaign(CampaignInterface):
+    def __init__(
+        self, discount_percentage: float, applicable_receipt: str, required_price: int
+    ) -> None:
+        self.applicable_receipt = applicable_receipt
+        self.discount_percentage = discount_percentage
+        self.required_price = required_price
+
+    def apply(self, receipt: Receipt) -> Receipt:
+        receipt.discounted_total = receipt.total
+        if receipt.total >= self.required_price:
+            receipt.discounted_total = round(
+                receipt.total * (1 - self.discount_percentage / 100)
+            )
+        return receipt
+
+    def to_request(self) -> CampaignRequestWithType:
+        return CampaignRequestWithType(
+            type="discount_receipt",
+            params={
+                "discount_percentage": self.discount_percentage,
+                "applicable_receipt": self.applicable_receipt,
+                "required_price": self.required_price,
+            },
+        )
+
+    @classmethod
+    def create(cls, **kwargs: typing.Any) -> CampaignInterface:
+        discount_percentage = kwargs.get("discount_percentage")
+        applicable_receipt = kwargs.get("applicable_receipt")
+        required_price = kwargs.get("required_price")
+        if not isinstance(discount_percentage, (int, float)):
+            raise TypeError("discount_percentage must be a float")
+        if not isinstance(applicable_receipt, str):
+            raise TypeError("product_id must be a str")
+        if not isinstance(required_price, int):
+            raise TypeError("product_id must be a str")
+        return cls(discount_percentage, applicable_receipt, required_price)
 
 
 class ComboCampaign(CampaignInterface):

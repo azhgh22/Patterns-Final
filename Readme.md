@@ -29,13 +29,26 @@ This project is a FastAPI-based service for a Point of Sales (POS) system. It pr
 ## Campaign Types
 ### Discount
 - Discounts can be applied to specific items if a threshold is met.
-- campaign_type `discount`  
+- campaign_type `discount_product`  
 
 **Example Request:**
 ```json
 {
   "discount_percentage": 20,
   "applicable_product": "1"
+}
+```
+
+### Discount
+- Discounts can be applied to specific receipt if a threshold is met.
+- campaign_type `discount_receipt`  
+
+**Example Request:**
+```json
+{
+  "discount_percentage": 20,
+  "applicable_receipt": "1",
+  "required_price": 200
 }
 ```
 

@@ -64,12 +64,24 @@ def test_should_add_campaign_combo() -> None:
     assert response.json().get("description")["params"]["discount_percentage"] == 10
 
 
-def test_should_add_campaign_discount() -> None:
+def test_should_add_campaign_discount_product() -> None:
     response = get_http().post(
-        "/campaigns?campaign_type=discount",
+        "/campaigns?campaign_type=discount_product",
         json={"discount_percentage": 20, "applicable_product": "10"},
     )
 
     assert response.status_code == 200
-    assert response.json().get("description")["type"] == "discount"
+    assert response.json().get("description")["type"] == "discount_product"
     assert response.json().get("description")["params"]["discount_percentage"] == 20
+
+
+def test_should_add_campaign_discount_receipt() -> None:
+    response = get_http().post(
+        "/campaigns?campaign_type=discount_receipt",
+        json={"discount_percentage": 20, "applicable_receipt": "10", "required_price": 200},
+    )
+
+    assert response.status_code == 200
+    assert response.json().get("description")["type"] == "discount_receipt"
+    assert response.json().get("description")["params"]["discount_percentage"] == 20
+    assert response.json().get("description")["params"]["required_price"] == 200

@@ -66,14 +66,29 @@ def test_delete_by_id() -> None:
         assert False
 
 
-def test_get_campaign_request_with_type_instance_discount() -> None:
+def test_get_campaign_request_with_type_instance_discount_product() -> None:
     service = CampaignService(CampaignInMemoryRepository())
     res = service.get_campaign_request_with_type_instance(
-        "discount", **{"applicable_product": "1", "discount_percentage": 50}
+        "discount_product", **{"applicable_product": "1", "discount_percentage": 50}
     )
     assert res is not None
-    assert res.type == "discount"
+    assert res.type == "discount_product"
     assert res.params == {"applicable_product": "1", "discount_percentage": 50}
+
+
+def test_get_campaign_request_with_type_instance_discount_receipt() -> None:
+    service = CampaignService(CampaignInMemoryRepository())
+    res = service.get_campaign_request_with_type_instance(
+        "discount_receipt",
+        **{"applicable_receipt": "1", "discount_percentage": 50, "required_price": 100},
+    )
+    assert res is not None
+    assert res.type == "discount_receipt"
+    assert res.params == {
+        "applicable_receipt": "1",
+        "discount_percentage": 50,
+        "required_price": 100,
+    }
 
 
 def test_get_campaign_request_with_type_instance_combo() -> None:
@@ -96,14 +111,14 @@ def test_get_campaign_request_with_type_instance_buy_n_get_n() -> None:
     assert res.params == {"product_id": "1", "required_quantity": 1}
 
 
-def test_apply_discount() -> None:
+def test_apply_discount_product() -> None:
     service = CampaignService(
         CampaignInMemoryRepository(
             [
                 Campaign(
                     id="1",
                     description=CampaignRequestWithType(
-                        type="discount",
+                        type="discount_product",
                         params={"applicable_product": "1", "discount_percentage": 50},
                     ),
                 )
@@ -129,7 +144,7 @@ def test_apply_discount() -> None:
                     total=100,
                 ),
             ],
-            total=100,
+            total=200,
             discounted_total=None,
         )
     )
@@ -138,6 +153,52 @@ def test_apply_discount() -> None:
     assert res.discounted_total == 150
     assert res.products[0].price == 100
     assert res.products[0].total == 50
+
+
+def test_apply_discount_receipt() -> None:
+    service = CampaignService(
+        CampaignInMemoryRepository(
+            [
+                Campaign(
+                    id="1",
+                    description=CampaignRequestWithType(
+                        type="discount_receipt",
+                        params={
+                            "applicable_receipt": "1",
+                            "discount_percentage": 50,
+                            "required_price": 100,
+                        },
+                    ),
+                )
+            ]
+        )
+    )
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="1",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    product_id="2",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+            ],
+            total=200,
+            discounted_total=None,
+        )
+    )
+    assert res is not None
+    assert res.id == "1"
+    assert res.discounted_total == 100
 
 
 def test_apply_buy_n_get_n() -> None:

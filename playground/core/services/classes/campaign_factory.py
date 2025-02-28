@@ -4,14 +4,16 @@ from playground.core.services.classes.campaign_classes import (
     BuyNGetNCampaign,
     CampaignInterface,
     ComboCampaign,
-    DiscountCampaign,
+    DiscountProductCampaign,
+    DiscountReceiptCampaign,
 )
 
 
 class CampaignFactory:
     CAMPAIGN_TYPES = {
         "buy_n_get_n": BuyNGetNCampaign,
-        "discount": DiscountCampaign,
+        "discount_product": DiscountProductCampaign,
+        "discount_receipt": DiscountReceiptCampaign,
         "combo": ComboCampaign,
     }
 
