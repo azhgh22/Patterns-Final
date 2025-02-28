@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from fastapi import FastAPI
 
+from playground.core.services.classes.repository_in_memory_chooser import InMemoryChooser
 from playground.core.services.classes.repositroy_sql_lite_chooser import SqlLiteChooser
 from playground.core.services.classes.service_chooser import ServiceChooser
 from playground.core.services.interfaces.service_interfaces.repository_chooser_interface import (
@@ -21,7 +22,7 @@ from playground.infra.API.shifts_api import shifts_api
 @dataclass
 class SetupConfiguration:
     service_chooser: IServiceChooser = ServiceChooser()
-    repository_chooser: IRepositoryChooser = SqlLiteChooser()
+    repository_chooser: IRepositoryChooser = InMemoryChooser()
 
 
 def set_up_routes(api: FastAPI) -> None:
