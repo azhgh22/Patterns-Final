@@ -12,7 +12,7 @@ class ErApiConverter:
         rates = data.get("rates", {})
 
         if to_currency not in rates:
-            raise IndexError(f"Currency {to_currency} is not supported.")
+            raise IndexError(f"Currency {to_currency.upper()} is not supported.")
 
         conversion_rate = float(rates[to_currency])
         return amount * conversion_rate
