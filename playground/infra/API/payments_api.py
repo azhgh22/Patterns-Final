@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from starlette.requests import Request
@@ -26,14 +28,14 @@ def get_payment_service(request: Request) -> IPaymentsService:
 
 class PaymentRequestModel(BaseModel):
     currency_id: str
-    amount: int
+    price: int
 
 
-@payments_api.get("/calculate", status_code=200)
+@payments_api.post("/calculate", status_code=200)
 def calculate_payment(request: Request, payment: PaymentRequestModel) -> int:
     try:
         amount = get_payment_service(request).calculate_payment(
-            payment.currency_id, payment.amount
+            payment.currency_id, payment.price
         )
     except Exception as e:
         raise HTTPException(

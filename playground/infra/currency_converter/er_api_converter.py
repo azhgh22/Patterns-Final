@@ -1,11 +1,10 @@
-from dataclasses import dataclass
 
 import requests
 
 
 class ErApiConverter:
-    def __init__(self):
-        url = f"https://open.er-api.com/v6/latest/GEL"
+    def __init__(self) -> None:
+        url = "https://open.er-api.com/v6/latest/GEL"
         response = requests.get(url)
         data = response.json()
         self.rates = data.get("rates", {})
