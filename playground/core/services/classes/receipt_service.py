@@ -40,8 +40,6 @@ class ReceiptService:
         new_receipt = shift_service.add_receipt(
             Receipt(receipt_id, "", ReceiptStatus.OPEN, [], 0, None)
         )
-        # print(prod_req)
-
         self.receipt_repo.store_receipt(new_receipt)
         return new_receipt
 

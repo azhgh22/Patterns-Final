@@ -3,6 +3,7 @@ from playground.core.services.classes.payment_service import PaymentService
 from playground.core.services.classes.product_service import ProductService
 from playground.core.services.classes.receipt_service import ReceiptService
 from playground.core.services.classes.shift_service import ShiftService
+from playground.core.services.interfaces.currency_converter_interface import ICurrencyConverter
 from playground.core.services.interfaces.memory.campaign_repository import (
     CampaignRepository,
 )
@@ -44,5 +45,7 @@ class ServiceChooser:
     def get_shift_service(self, shift_repo: ShiftRepository) -> IShiftService:
         return ShiftService(shift_repo)
 
-    def get_payment_service(self, payment_repo: PaymentRepository) -> IPaymentsService:
-        return PaymentService(payment_repo)
+    def get_payment_service(
+        self, payment_repo: PaymentRepository, converter: ICurrencyConverter
+    ) -> IPaymentsService:
+        return PaymentService(payment_repo, converter)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from typing import Final
 
@@ -8,6 +9,7 @@ from playground.core.services.classes.repository_in_memory_chooser import (
 )
 from playground.core.services.classes.repositroy_sql_lite_chooser import SqlLiteChooser
 from playground.core.services.classes.service_chooser import ServiceChooser
+from playground.core.services.interfaces.currency_converter_interface import ICurrencyConverter
 from playground.core.services.interfaces.memory.campaign_repository import CampaignRepository
 from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.core.services.interfaces.memory.product_repository import ProductRepository
@@ -25,6 +27,7 @@ from playground.infra.API.products_api import products_api
 from playground.infra.API.receipts_api import receipts_api
 from playground.infra.API.sales_api import sales_api
 from playground.infra.API.shifts_api import shifts_api
+from playground.infra.currency_converter.er_api_converter import ErApiConverter
 from playground.infra.memory.in_memory.campaign_in_memory_repository import (
     CampaignInMemoryRepository,
 )
@@ -46,10 +49,11 @@ DB_NAME: Final = "shop.db"
 class SetupConfiguration:
     service_chooser: IServiceChooser
     repository_chooser: IRepositoryChooser
+    converter: ICurrencyConverter
 
     @classmethod
-    def for_production(cls) -> "SetupConfiguration":
-        return cls(ServiceChooser(), SqlLiteChooser(DB_NAME))
+    def for_production(cls) -> SetupConfiguration:
+        return cls(ServiceChooser(), SqlLiteChooser(DB_NAME), ErApiConverter())
 
     @classmethod
     def for_testing(
@@ -59,10 +63,12 @@ class SetupConfiguration:
         receipt_repo: ReceiptRepository = ReceiptInMemoryRepository(),
         payment_repo: PaymentRepository = PaymentInMemoryRepository(),
         campaign_repo: CampaignRepository = CampaignInMemoryRepository(),
-    ) -> "SetupConfiguration":
+        converter: ICurrencyConverter = ErApiConverter(),
+    ) -> SetupConfiguration:
         return cls(
             ServiceChooser(),
             InMemoryChooser(product_repo, shift_repo, receipt_repo, payment_repo, campaign_repo),
+            converter,
         )
 
 
@@ -79,5 +85,6 @@ def setup(setup_conf: SetupConfiguration) -> FastAPI:
     api = FastAPI()
     api.state.repo = setup_conf.repository_chooser
     api.state.core = setup_conf.service_chooser
+    api.state.conv = setup_conf.converter
     set_up_routes(api)
     return api

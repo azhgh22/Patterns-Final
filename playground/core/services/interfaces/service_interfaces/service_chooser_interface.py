@@ -1,5 +1,6 @@
 from typing import Protocol
 
+from playground.core.services.interfaces.currency_converter_interface import ICurrencyConverter
 from playground.core.services.interfaces.memory.campaign_repository import CampaignRepository
 from playground.core.services.interfaces.memory.payment_repository import PaymentRepository
 from playground.core.services.interfaces.memory.product_repository import (
@@ -39,5 +40,7 @@ class IServiceChooser(Protocol):
     def get_shift_service(self, shift_repo: ShiftRepository) -> IShiftService:
         pass
 
-    def get_payment_service(self, payment_repo: PaymentRepository) -> IPaymentsService:
+    def get_payment_service(
+        self, payment_repo: PaymentRepository, converter: ICurrencyConverter
+    ) -> IPaymentsService:
         pass

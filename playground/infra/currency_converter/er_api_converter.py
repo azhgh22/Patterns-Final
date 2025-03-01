@@ -1,9 +1,17 @@
+from dataclasses import dataclass
+
 import requests
 
 
 class ErApiConverter:
+    def __init__(self):
+        url = f"https://open.er-api.com/v6/latest/GEL"
+        response = requests.get(url)
+        data = response.json()
+        self.rates = data.get("rates", {})
+
     def convert(self, from_currency: str, to_currency: str, amount: float) -> float:
-        url = "https://open.er-api.com/v6/latest/GEL"
+        url = f"https://open.er-api.com/v6/latest/{from_currency.upper()}"
         response = requests.get(url)
         if response.status_code != 200:
             raise Exception("Failed to fetch currency rates.")

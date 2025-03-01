@@ -59,14 +59,12 @@ class UpdateModel(BaseModel):
 
 
 @products_api.patch("/{product_id}")
-def update_product(
-    request: Request, product_id: str, data: UpdateModel
-) -> Product | None:
+def update_product(request: Request, product_id: str, data: UpdateModel) -> Product | None:
     service = get_product_service(request)
     try:
         service.update(product_id, data.price)
         return service.get_product(product_id)
     except ValueError:
-        raise HTTPException(status_code=409)
+        raise HTTPException(status_code=409, detail="price can not be negative")
     except IndexError:
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, detail="product does not exist")
