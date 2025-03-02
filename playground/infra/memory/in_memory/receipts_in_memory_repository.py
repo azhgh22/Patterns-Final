@@ -75,3 +75,11 @@ class ReceiptInMemoryRepository:
         receipt = self.get_receipt(item.receipt_id)
         if receipt is not None:
             receipt.products.remove(item)
+
+    def close(self, updated_receipt: Receipt) -> None:
+        receipt = self.get_receipt(updated_receipt.id)
+        if receipt is None:
+            return
+        receipt.status = updated_receipt.status
+        receipt.discounted_total = updated_receipt.discounted_total
+        receipt.products = updated_receipt.products

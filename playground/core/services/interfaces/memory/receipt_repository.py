@@ -34,3 +34,6 @@ class ReceiptRepository(Protocol):
 
     def update_receipt_price(self, receipt_id: str, price: int) -> None:
         pass
+
+    def close(self, updated_receipt: Receipt) -> None:
+        pass

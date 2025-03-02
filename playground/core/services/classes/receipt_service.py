@@ -65,8 +65,7 @@ class ReceiptService:
         payment = Payment(receipt_id, currency_id, total)
         payment_service.register_payment(payment)
         updated_receipt.status = ReceiptStatus.CLOSED
-        self.receipt_repo.delete_receipt(receipt_id)
-        self.receipt_repo.store_receipt(updated_receipt)
+        self.receipt_repo.close(updated_receipt)
         return updated_receipt
 
     def delete(self, receipt_id: str, shift_service: IShiftService) -> None:

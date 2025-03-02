@@ -204,3 +204,26 @@ def test_should_return_all_receipts(conn: Connection) -> None:
     assert len(receipts) == 1
     assert receipts[0].id == "1"
     conn.close()
+
+
+def test_should_close_receipts(conn: Connection) -> None:
+    repo = ReceiptSqlLiteRepository(conn)
+    insert_receipt(conn, items=[ReceiptItem("1", "1", 1, 10, 10)])
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert receipt.status == ReceiptStatus.OPEN
+    assert receipt.discounted_total is None
+    assert len(receipt.products) == 1
+    assert receipt.products[0].quantity == 1
+    receipt.discounted_total = 100
+    receipt.products[0].quantity = 10
+    receipt.products[0].total = 100
+    receipt.status = ReceiptStatus.CLOSED
+    repo.close(receipt)
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert receipt.status == ReceiptStatus.CLOSED
+    assert receipt.discounted_total == 100
+    assert len(receipt.products) == 1
+    assert receipt.products[0].quantity == 10
+    assert receipt.products[0].total == 100

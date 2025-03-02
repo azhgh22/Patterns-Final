@@ -109,6 +109,25 @@ class ReceiptSqlLiteRepository:
         )
         self.connection.commit()
 
+    def close(self, updated_receipt: Receipt) -> None:
+        self.connection.execute(
+            """
+            update receipts
+            set discounted_total = ?, status = ?
+            where id = ?;
+        """,
+            (updated_receipt.discounted_total, updated_receipt.status.name, updated_receipt.id),
+        )
+
+        for item in updated_receipt.products:
+            self.connection.execute(
+                """UPDATE receipt_items SET quantity = ?, total = ? 
+                       WHERE product_id = ? and receipt_id = ?""",
+                (item.quantity, item.total, item.product_id, item.receipt_id),
+            )
+
+        self.connection.commit()
+
     def __create_tables(self) -> None:
         # Create receipts table
         self.connection.execute("""
