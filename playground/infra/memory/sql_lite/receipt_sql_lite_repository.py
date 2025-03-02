@@ -105,7 +105,7 @@ class ReceiptSqlLiteRepository:
             """
             update receipts
             set total = ?
-            where receipt_id = ?;
+            where id = ?;
         """,
             (price, receipt_id),
         )
