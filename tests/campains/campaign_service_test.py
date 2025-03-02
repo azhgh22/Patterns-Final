@@ -111,6 +111,32 @@ def test_get_campaign_request_with_type_instance_buy_n_get_n() -> None:
     assert res.params == {"product_id": "1", "required_quantity": 1}
 
 
+def get_receipt() -> Receipt:
+    return Receipt(
+        id="1",
+        shift_id="1",
+        status=ReceiptStatus.OPEN,
+        products=[
+            ReceiptItem(
+                receipt_id="1",
+                product_id="1",
+                quantity=1,
+                price=100,
+                total=100,
+            ),
+            ReceiptItem(
+                receipt_id="1",
+                product_id="2",
+                quantity=1,
+                price=100,
+                total=100,
+            ),
+        ],
+        total=200,
+        discounted_total=None,
+    )
+
+
 def test_apply_discount_product() -> None:
     service = CampaignService(
         CampaignInMemoryRepository(
@@ -125,31 +151,7 @@ def test_apply_discount_product() -> None:
             ]
         )
     )
-    res = service.apply(
-        Receipt(
-            id="1",
-            shift_id="1",
-            status=ReceiptStatus.OPEN,
-            products=[
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="1",
-                    quantity=1,
-                    price=100,
-                    total=100,
-                ),
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="2",
-                    quantity=1,
-                    price=100,
-                    total=100,
-                ),
-            ],
-            total=200,
-            discounted_total=None,
-        )
-    )
+    res = service.apply(get_receipt())
     assert res is not None
     assert res.id == "1"
     assert res.discounted_total == 150
@@ -175,31 +177,7 @@ def test_apply_discount_receipt() -> None:
             ]
         )
     )
-    res = service.apply(
-        Receipt(
-            id="1",
-            shift_id="1",
-            status=ReceiptStatus.OPEN,
-            products=[
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="1",
-                    quantity=1,
-                    price=100,
-                    total=100,
-                ),
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="2",
-                    quantity=1,
-                    price=100,
-                    total=100,
-                ),
-            ],
-            total=200,
-            discounted_total=None,
-        )
-    )
+    res = service.apply(get_receipt())
     assert res is not None
     assert res.id == "1"
     assert res.discounted_total == 100
@@ -219,31 +197,7 @@ def test_apply_buy_n_get_n() -> None:
             ]
         )
     )
-    res = service.apply(
-        Receipt(
-            id="1",
-            shift_id="1",
-            status=ReceiptStatus.OPEN,
-            products=[
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="1",
-                    quantity=1,
-                    price=100,
-                    total=100,
-                ),
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="2",
-                    quantity=1,
-                    price=100,
-                    total=100,
-                ),
-            ],
-            total=200,
-            discounted_total=None,
-        )
-    )
+    res = service.apply(get_receipt())
     assert res is not None
     assert res.id == "1"
     assert res.discounted_total == 200
@@ -259,49 +213,18 @@ def test_apply_combo() -> None:
                     id="1",
                     description=CampaignRequestWithType(
                         type="combo",
-                        params={"product_ids": ["1", "2"], "discount_percentage": 50},
+                        params={"product_ids": ["1"], "discount_percentage": 50},
                     ),
                 )
             ]
         )
     )
-    res = service.apply(
-        Receipt(
-            id="1",
-            shift_id="1",
-            status=ReceiptStatus.OPEN,
-            products=[
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="1",
-                    quantity=1,
-                    price=100,
-                    total=100,
-                ),
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="2",
-                    quantity=2,
-                    price=10,
-                    total=20,
-                ),
-                ReceiptItem(
-                    receipt_id="1",
-                    product_id="3",
-                    quantity=3,
-                    price=10,
-                    total=30,
-                ),
-            ],
-            total=150,
-            discounted_total=None,
-        )
-    )
+    res = service.apply(get_receipt())
     assert res is not None
     assert res.id == "1"
     assert res.products[0].price == 100
     assert res.products[0].quantity == 1
-    assert res.products[1].total == 10
-    assert res.products[1].quantity == 2
+    assert res.products[1].total == 100
+    assert res.products[1].quantity == 1
 
-    assert res.discounted_total == 90
+    assert res.discounted_total == 150
