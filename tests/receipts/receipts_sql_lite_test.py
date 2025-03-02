@@ -58,7 +58,7 @@ def get_receipt_direct(conn: Connection, receipt_id: str) -> Receipt | None:
     )
     items = conn.execute(
         """
-        SELECT product_id, quantity, price, total
+        SELECT receipt_id ,product_id, quantity, price, total
         FROM receipt_items
         WHERE receipt_id = ?
         """,
@@ -66,9 +66,7 @@ def get_receipt_direct(conn: Connection, receipt_id: str) -> Receipt | None:
     ).fetchall()
 
     for item in items:
-        receipt.products.append(
-            ReceiptItem(product_id=item[0], quantity=item[1], price=item[2], total=item[3])
-        )
+        receipt.products.append(ReceiptItem(item[0], item[1], item[2], item[3], item[4]))
     return receipt
 
 
@@ -94,7 +92,7 @@ def test_should_store_new_receipt(conn: Connection) -> None:
         shift_id="s1",
         status=ReceiptStatus.OPEN,
         products=[],
-        total=0,
+        total=100,
         discounted_total=None,
     )
     repo.store_receipt(receipt)
@@ -166,44 +164,15 @@ def test_should_add_product_to_receipt(conn: Connection) -> None:
     product = Product("p1", "Test Product", "barcode1", 100)
 
     # Add product with quantity 2.
-    updated = repo.add_product_to_receipt(receipt, product, 2)
+    updated = repo.add_product_to_receipt(
+        ReceiptItem(receipt.id, product.id, 2, product.price, 2 * product.price)
+    )
+    assert updated is not None
     assert len(updated.products) == 1
     item = updated.products[0]
     assert item.product_id == "p1"
     assert item.quantity == 2
     assert item.price == 100
     assert item.total == 200
-    assert updated.total == 200
-
-    # Add the same product with an additional quantity of 3.
-    updated = repo.add_product_to_receipt(receipt, product, 3)
-    assert len(updated.products) == 1
-    item = updated.products[0]
-    assert item.quantity == 5
-    assert item.total == 500
-    assert updated.total == 500
-    conn.close()
-
-
-def test_should_close_receipt(conn: Connection) -> None:
-    repo = ReceiptSqlLiteRepository(conn)
-    receipt = Receipt(
-        id="r1",
-        shift_id="s1",
-        status=ReceiptStatus.OPEN,
-        products=[],
-        total=100,
-        discounted_total=None,
-    )
-    insert_receipt(conn, receipt)
-    # Update receipt details.
-    receipt.total = 150
-    receipt.discounted_total = 140
-    receipt.status = ReceiptStatus.CLOSED
-    repo.close_receipt(receipt)
-    updated = get_receipt_direct(conn, "r1")
-    assert updated is not None
-    assert updated.total == 150
-    assert updated.discounted_total == 140
-    assert updated.status == ReceiptStatus.CLOSED
+    assert updated.total == 0
     conn.close()

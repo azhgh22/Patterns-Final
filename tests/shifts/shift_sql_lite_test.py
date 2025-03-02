@@ -48,25 +48,27 @@ class ReceiptRepoMock(ReceiptSqlLiteRepository):
         self.conn.commit()
         return self
 
-    def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
+    def update_shift_id(self, shift_id: str, receipt_id: str) -> bool:
         self.conn.execute(f"""
             update shift_receipt_linker
             set shift_id = '{shift_id}'
             where receipt_id = '{receipt_id}'
         """)
         self.conn.commit()
+        return True
 
     def get_receipt(self, receipt_id: str) -> Receipt | None:
         return Receipt("1", "1", ReceiptStatus.OPEN, [], 3, 3)
 
 
 def insert_shift(conn: Connection, shift: Shift) -> None:
+    print(shift.state)
     conn.execute(
         """
         insert into shifts (id,status)
         values(?,?)
     """,
-        (shift.id, str(shift.state)),
+        (shift.id, shift.state),
     )
     conn.commit()
 
@@ -113,14 +115,14 @@ def test_should_change_shift_status(conn: Connection) -> None:
     repo = ShiftSqlLiteRepository(conn, ReceiptSqlLiteRepository(conn))
     insert_shift(conn, Shift("1", ShiftState.OPEN, []))
     repo.close("1")
-    assert get_shift_status(conn, "1") == str(ShiftState.CLOSED)
+    assert get_shift_status(conn, "1") == ShiftState.CLOSED
     conn.close()
 
 
 def test_should_add_new_shift(conn: Connection) -> None:
     repo = ShiftSqlLiteRepository(conn, ReceiptRepoMock(conn))
     repo.store(Shift("1", ShiftState.OPEN, []))
-    assert get_shift_status(conn, "1") == str(ShiftState.OPEN)
+    assert get_shift_status(conn, "1") == ShiftState.OPEN
     assert get_shift_receipts(conn, "1") == []
     conn.close()
 
@@ -147,3 +149,4 @@ def test_should_add_receipt_to_shift(conn: Connection) -> None:
     """).fetchone()
     assert res is not None
     assert str(res[0]) == "1"
+    conn.close()

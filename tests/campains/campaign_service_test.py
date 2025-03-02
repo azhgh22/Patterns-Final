@@ -132,12 +132,14 @@ def test_apply_discount_product() -> None:
             status=ReceiptStatus.OPEN,
             products=[
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="1",
                     quantity=1,
                     price=100,
                     total=100,
                 ),
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="2",
                     quantity=1,
                     price=100,
@@ -180,12 +182,14 @@ def test_apply_discount_receipt() -> None:
             status=ReceiptStatus.OPEN,
             products=[
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="1",
                     quantity=1,
                     price=100,
                     total=100,
                 ),
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="2",
                     quantity=1,
                     price=100,
@@ -222,12 +226,14 @@ def test_apply_buy_n_get_n() -> None:
             status=ReceiptStatus.OPEN,
             products=[
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="1",
                     quantity=1,
                     price=100,
                     total=100,
                 ),
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="2",
                     quantity=1,
                     price=100,
@@ -266,18 +272,21 @@ def test_apply_combo() -> None:
             status=ReceiptStatus.OPEN,
             products=[
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="1",
                     quantity=1,
                     price=100,
                     total=100,
                 ),
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="2",
                     quantity=2,
                     price=10,
                     total=20,
                 ),
                 ReceiptItem(
+                    receipt_id="1",
                     product_id="3",
                     quantity=3,
                     price=10,

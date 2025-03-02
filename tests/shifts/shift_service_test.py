@@ -52,7 +52,7 @@ def test_should_get_stored_shift() -> None:
         "1",
         "1",
         ReceiptStatus.OPEN,
-        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
         20,
         10,
     )
@@ -97,7 +97,7 @@ def test_remove_receipt_from_closed_shift_should_fail() -> None:
         "1",
         "1",
         ReceiptStatus.CLOSED,
-        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
         20,
         10,
     )
@@ -115,7 +115,7 @@ def test_remove_receipt_from_shift() -> None:
         "1",
         "1",
         ReceiptStatus.OPEN,
-        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
         20,
         10,
     )
@@ -139,7 +139,7 @@ def test_close_shift_with_open_receipt_should_fail() -> None:
         "1",
         "1",
         ReceiptStatus.OPEN,
-        [ReceiptItem("1", 2, 6, 12), ReceiptItem("2", 2, 4, 8)],
+        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
         20,
         10,
     )
@@ -160,7 +160,7 @@ def test_close_shift() -> None:
 
 def test_x_report() -> None:
     x_report = XReport("1", 1, [ProductReport("1", 2)], [Revenue("GEL", 10)])
-    receipt = Receipt("1", "1", ReceiptStatus.CLOSED, [ReceiptItem("1", 2, 5, 10)], 10, 10)
+    receipt = Receipt("1", "1", ReceiptStatus.CLOSED, [ReceiptItem("1", "1", 2, 5, 10)], 10, 10)
     shift_list = [Shift("1", ShiftState.CLOSED, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
 

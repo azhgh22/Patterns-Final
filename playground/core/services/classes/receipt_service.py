@@ -7,6 +7,7 @@ from playground.core.models.receipt import (
     AddProductRequest,
     Receipt,
     ReceiptRequest,
+    ReceiptItem,
 )
 from playground.core.services.interfaces.memory.receipt_repository import (
     ReceiptRepository,
@@ -64,7 +65,8 @@ class ReceiptService:
         payment = Payment(receipt_id, currency_id, total)
         payment_service.register_payment(payment)
         updated_receipt.status = ReceiptStatus.CLOSED
-        self.receipt_repo.close_receipt(updated_receipt)
+        self.receipt_repo.delete_receipt(receipt_id)
+        self.receipt_repo.store_receipt(updated_receipt)
         return updated_receipt
 
     def delete(self, receipt_id: str, shift_service: IShiftService) -> None:
@@ -96,6 +98,20 @@ class ReceiptService:
             raise ValueError(f"Receipt with id {receipt_id} does not exist.")
         elif receipt.status != ReceiptStatus.OPEN:
             raise ValueError("Receipt status should be open.")
-        return self.receipt_repo.add_product_to_receipt(
-            receipt, product, product_request.quantity
+
+        total = product.price * product_request.quantity
+        new_item = ReceiptItem(
+            receipt.id, product.id, product_request.quantity, product.price, total
         )
+
+        item = self.receipt_repo.get_item(product.id, receipt_id)
+        if item is not None:
+            new_item.quantity += item.quantity
+            new_item.total += item.total
+            self.receipt_repo.remove_item(item)
+
+        self.receipt_repo.update_receipt_price(receipt_id, receipt.total + total)
+        receipt = self.receipt_repo.add_product_to_receipt(new_item)
+        if receipt is None:
+            raise ValueError(f"Receipt with id {receipt_id} does not exist.")
+        return receipt

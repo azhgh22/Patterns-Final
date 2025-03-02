@@ -1,6 +1,5 @@
 from typing import List
 
-from playground.core.models.product import Product
 from playground.core.models.receipt import (
     Receipt,
     ReceiptItem,
@@ -35,29 +34,24 @@ class ReceiptInMemoryRepository:
                 return receipt
         return None
 
-    def add_product_to_receipt(
-        self, receipt: Receipt, product: Product, quantity: int
-    ) -> Receipt:
-        receipt_item = receipt.get_receipt_item(product)
-        if receipt_item is None:
-            receipt.products.append(
-                ReceiptItem(product.id, quantity, product.price, product.price * quantity)
-            )
-        else:
-            receipt_item.add_item(quantity)
+    def add_product_to_receipt(self, item: ReceiptItem) -> Receipt | None:
+        receipt = self.get_receipt(item.receipt_id)
+        if receipt is not None:
+            receipt.products.append(item)
 
-        receipt.total += product.price * quantity
-        return receipt
+        return self.get_receipt(item.receipt_id)
 
-    def close_receipt(self, updated_receipt: Receipt) -> None:
-        for r in self.receipt_list:
-            if r.id == updated_receipt.id:
-                r = updated_receipt
+    def update_receipt_price(self, receipt_id: str, price: int) -> None:
+        receipt = self.get_receipt(receipt_id)
+        if receipt is not None:
+            receipt.total = price
 
-    def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
+    def update_shift_id(self, shift_id: str, receipt_id: str) -> bool:
         for receipt in self.receipt_list:
             if receipt.id == receipt_id:
                 receipt.shift_id = shift_id
+                return True
+        return False
 
     def get_all_receipts(self, shift_id: str) -> list[Receipt]:
         new_list: list[Receipt] = []
@@ -66,9 +60,18 @@ class ReceiptInMemoryRepository:
                 new_list.append(receipt)
         return new_list
 
-    def clear_receipt_shift_id(self, receipt_id: str) -> bool:
+    def get_item(self, product_id: str, receipt_id: str) -> ReceiptItem | None:
         receipt = self.get_receipt(receipt_id)
         if receipt is None:
-            return False
-        receipt.shift_id = ""
-        return True
+            return None
+
+        for item in receipt.products:
+            if product_id == item.product_id:
+                return item
+
+        return None
+
+    def remove_item(self, item: ReceiptItem) -> None:
+        receipt = self.get_receipt(item.receipt_id)
+        if receipt is not None:
+            receipt.products.remove(item)

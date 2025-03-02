@@ -25,18 +25,26 @@ class ReceiptSqlLiteRepository:
         )
         # Insert each receipt item.
         for item in receipt.products:
-            self.connection.execute(
-                "INSERT INTO receipt_items (receipt_id, product_id, quantity, price, total) "
-                "VALUES (?, ?, ?, ?, ?)",
-                (receipt.id, item.product_id, item.quantity, item.price, item.total),
-            )
+            self.add_product_to_receipt(item)
         self.connection.commit()
 
+    def __get_receipt_key_val(self, key: str, value: str) -> list[Receipt]:
+        rows = self.connection.execute(f"""
+            select * from receipts where {key}='{value}';
+        """).fetchall()
+
+        return list(Receipt(x[0], x[1], x[2], [], x[3], x[4]) for x in rows)
+
+    def __get_item_key_value(self, key: str, value: str) -> list[ReceiptItem]:
+        rows = self.connection.execute(f"""
+            select * from receipt_items where {key}='{value}';
+        """).fetchall()
+
+        return list(ReceiptItem(x[0], x[1], x[2], x[3], x[4]) for x in rows)
+
     def contains_receipt(self, receipt_id: str) -> bool:
-        cursor = self.connection.execute(
-            "SELECT 1 FROM receipts WHERE id = ? LIMIT 1", (receipt_id,)
-        )
-        return cursor.fetchone() is not None
+        res = self.__get_receipt_key_val("id", receipt_id)
+        return len(res) > 0
 
     # Returns True if receipt is successfully deleted
     def delete_receipt(self, receipt_id: str) -> bool:
@@ -46,140 +54,61 @@ class ReceiptSqlLiteRepository:
         return cursor.rowcount > 0
 
     def get_receipt(self, receipt_id: str) -> Receipt | None:
-        cursor = self.connection.execute(
-            "SELECT id, shift_id, status, total, discounted_total FROM receipts WHERE id = ?",
-            (receipt_id,),
-        )
-        row = cursor.fetchone()
-        if row is None:
+        res = self.__get_receipt_key_val("id", receipt_id)
+        if len(res) != 1:
             return None
-
-        status = ReceiptStatus[row[2]]
-        receipt = Receipt(
-            id=row[0],
-            shift_id=row[1],
-            status=status,
-            products=[],
-            total=row[3],
-            discounted_total=row[4],
-        )
-        items_cursor = self.connection.execute(
-            "SELECT product_id, quantity, price, total FROM receipt_items WHERE receipt_id = ?",
-            (receipt_id,),
-        )
-        for item_row in items_cursor.fetchall():
-            receipt.products.append(
-                ReceiptItem(
-                    product_id=item_row[0],
-                    quantity=item_row[1],
-                    price=item_row[2],
-                    total=item_row[3],
-                )
-            )
+        receipt = res[0]
+        items = self.__get_item_key_value("receipt_id", receipt_id)
+        receipt.products.extend(items)
         return receipt
 
-    def add_product_to_receipt(
-        self, receipt: Receipt, product: Product, quantity: int
-    ) -> Receipt:
-        # Check if the product already exists in the receipt.
-        cursor = self.connection.execute(
-            "SELECT id, quantity, price, total FROM receipt_items "
-            "WHERE receipt_id = ? AND product_id = ?",
-            (receipt.id, product.id),
-        )
-        row = cursor.fetchone()
-        if row is None:
-            # Insert a new receipt item.
-            item_total = product.price * quantity
-            self.connection.execute(
-                "INSERT INTO receipt_items (receipt_id, product_id, quantity, price, total)"
-                " VALUES (?, ?, ?, ?, ?)",
-                (receipt.id, product.id, quantity, product.price, item_total),
-            )
-            new_item = ReceiptItem(
-                product_id=product.id, quantity=quantity, price=product.price, total=item_total
-            )
-            receipt.products.append(new_item)
-        else:
-            # Update the existing receipt item.
-            item_id = row[0]
-            new_quantity = row[1] + quantity
-            new_total = product.price * new_quantity
-            self.connection.execute(
-                "UPDATE receipt_items SET quantity = ?, total = ? WHERE id = ?",
-                (new_quantity, new_total, item_id),
-            )
-            receipt_item = receipt.get_receipt_item(product)
-            if receipt_item is not None:
-                receipt_item.add_item(quantity)
-
-        receipt.total += product.price * quantity
+    def add_product_to_receipt(self, item: ReceiptItem) -> Receipt | None:
         self.connection.execute(
-            "UPDATE receipts SET total = ? WHERE id = ?", (receipt.total, receipt.id)
+            """
+            insert into receipt_items (receipt_id, product_id, quantity, price, total)
+            values (?,?,?,?,?)
+        """,
+            (item.receipt_id, item.product_id, item.quantity, item.price, item.total),
         )
         self.connection.commit()
-        return receipt
+        return self.get_receipt(item.receipt_id)
 
-    def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
-        self.connection.execute(
+    def update_shift_id(self, shift_id: str, receipt_id: str) -> bool:
+        rowcount = self.connection.execute(
             "UPDATE receipts SET shift_id = ? WHERE id = ?", (shift_id, receipt_id)
-        )
+        ).rowcount
         self.connection.commit()
+        return rowcount > 0
 
     def get_all_receipts(self, shift_id: str) -> list[Receipt]:
-        cursor = self.connection.execute(
-            "SELECT id, shift_id, status, total, discounted_total FROM receipts "
-            "WHERE shift_id = ?",
-            (shift_id,),
-        )
-        receipts = []
-        for row in cursor.fetchall():
-            try:
-                status = ReceiptStatus[row[2]]
-            except KeyError:
-                status = row[2]
-            receipt = Receipt(
-                id=row[0],
-                shift_id=row[1],
-                status=status,
-                products=[],
-                total=row[3],
-                discounted_total=row[4],
-            )
-            items_cursor = self.connection.execute(
-                "SELECT product_id, quantity, price, total FROM receipt_items "
-                "WHERE receipt_id = ?",
-                (row[0],),
-            )
-            for item in items_cursor.fetchall():
-                receipt.products.append(ReceiptItem(item[0], item[1], item[2], item[3]))
-            receipts.append(receipt)
+        receipts = self.__get_receipt_key_val("shift_id", shift_id)
+
+        for receipt in receipts:
+            receipt.products.extend(self.__get_item_key_value("receipt_id", receipt.id))
+
         return receipts
 
-    def clear_receipt_shift_id(self, receipt_id: str) -> bool:
-        cursor = self.connection.execute(
-            "UPDATE receipts SET shift_id = '' WHERE id = ?", (receipt_id,)
-        )
-        self.connection.commit()
-        return cursor.rowcount > 0
+    def get_item(self, product_id: str, receipt_id: str) -> ReceiptItem | None:
+        p_id = set(self.__get_item_key_value("product_id", product_id))
+        r_id = set(self.__get_item_key_value("receipt_id", receipt_id))
+        intersection = list(p_id.intersection(r_id))
+        return None if len(intersection) == 0 else intersection[0]
 
-    def close_receipt(self, updated_receipt: Receipt) -> None:
+    def remove_item(self, item: ReceiptItem) -> None:
         self.connection.execute(
-            "UPDATE receipts SET total = ?, discounted_total = ?, status = ? WHERE id = ?",
-            (
-                updated_receipt.total,
-                updated_receipt.discounted_total,
-                updated_receipt.status.name,
-                updated_receipt.id,
-            ),
+            """DELETE FROM receipt_items WHERE receipt_id = ? and product_id=?""",
+            (item.receipt_id, item.product_id),
         )
 
-        for item in updated_receipt.products:
-            self.connection.execute(
-                """UPDATE receipt_items SET quantity = ?, total = ? 
-                        WHERE product_id = ? and receipt_id = ?""",
-                (item.quantity, item.total, item.product_id, updated_receipt.id),
-            )
+    def update_receipt_price(self, receipt_id: str, price: int) -> None:
+        self.connection.execute(
+            """
+            update receipts
+            set total = ?
+            where receipt_id = ?;
+        """,
+            (price, receipt_id),
+        )
         self.connection.commit()
 
     def __create_tables(self) -> None:
@@ -196,7 +125,6 @@ class ReceiptSqlLiteRepository:
         # Create table for receipt items.
         self.connection.execute("""
             CREATE TABLE IF NOT EXISTS receipt_items (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 receipt_id TEXT,
                 product_id TEXT,
                 quantity INTEGER,

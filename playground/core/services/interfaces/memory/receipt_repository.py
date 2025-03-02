@@ -1,7 +1,5 @@
 from typing import Protocol
-
-from playground.core.models.product import Product
-from playground.core.models.receipt import Receipt
+from playground.core.models.receipt import Receipt, ReceiptItem
 
 
 class ReceiptRepository(Protocol):
@@ -18,19 +16,20 @@ class ReceiptRepository(Protocol):
     def get_receipt(self, receipt_id: str) -> Receipt | None:
         pass
 
-    def add_product_to_receipt(
-        self, receipt: Receipt, product: Product, quantity: int
-    ) -> Receipt:
+    def add_product_to_receipt(self, item: ReceiptItem) -> Receipt | None:
         pass
 
-    def close_receipt(self, updated_receipt: Receipt) -> None:
+    def remove_item(self, item: ReceiptItem) -> None:
         pass
 
-    def update_shift_id(self, shift_id: str, receipt_id: str) -> None:
+    def update_shift_id(self, shift_id: str, receipt_id: str) -> bool:
         pass
 
     def get_all_receipts(self, shift_id: str) -> list[Receipt]:
         pass
 
-    def clear_receipt_shift_id(self, receipt_id: str) -> bool:
+    def get_item(self, product_id: str, receipt_id: str) -> ReceiptItem | None:
+        pass
+
+    def update_receipt_price(self, receipt_id: str, price: int) -> None:
         pass

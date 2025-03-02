@@ -7,6 +7,7 @@ from playground.core.models.product import Product
 
 @dataclass
 class ReceiptItem:
+    receipt_id: str
     product_id: str
     quantity: int
     price: int
