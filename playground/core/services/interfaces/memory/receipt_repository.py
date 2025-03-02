@@ -1,4 +1,5 @@
 from typing import Protocol
+
 from playground.core.models.receipt import Receipt, ReceiptItem
 
 

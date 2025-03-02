@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel

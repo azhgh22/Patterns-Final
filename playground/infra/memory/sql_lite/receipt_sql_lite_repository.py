@@ -1,7 +1,5 @@
 from sqlite3 import Connection
 
-from playground.core.enums.receipt_status import ReceiptStatus
-from playground.core.models.product import Product
 from playground.core.models.receipt import Receipt, ReceiptItem
 
 

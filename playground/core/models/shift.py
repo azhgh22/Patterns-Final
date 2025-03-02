@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-from playground.core.enums.shift_state import ShiftState
 from playground.core.models.receipt import Receipt
 
 

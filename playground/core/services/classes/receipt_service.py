@@ -6,8 +6,8 @@ from playground.core.models.payments import Payment
 from playground.core.models.receipt import (
     AddProductRequest,
     Receipt,
-    ReceiptRequest,
     ReceiptItem,
+    ReceiptRequest,
 )
 from playground.core.services.interfaces.memory.receipt_repository import (
     ReceiptRepository,
