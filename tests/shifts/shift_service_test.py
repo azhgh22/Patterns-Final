@@ -22,6 +22,17 @@ class PaymentsServiceMock(PaymentService):
         return self.payment
 
 
+def get_receipt() -> Receipt:
+    return Receipt(
+        "1",
+        "1",
+        ReceiptStatus.OPEN,
+        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
+        20,
+        10,
+    )
+
+
 def test_env_works() -> None:
     assert True
 
@@ -48,15 +59,7 @@ def test_two_open_should_fail() -> None:
 
 
 def test_should_get_stored_shift() -> None:
-    receipt = Receipt(
-        "1",
-        "1",
-        ReceiptStatus.OPEN,
-        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
-        20,
-        10,
-    )
-    shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
+    shift_list = [Shift("1", ShiftState.OPEN, [get_receipt()])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     open_shift_id = service.get_open_shift_id()
     assert shift_list[0].id == open_shift_id
@@ -93,15 +96,7 @@ def test_add_receipt_to_shift() -> None:
 
 
 def test_remove_receipt_from_closed_shift_should_fail() -> None:
-    receipt = Receipt(
-        "1",
-        "1",
-        ReceiptStatus.CLOSED,
-        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
-        20,
-        10,
-    )
-    shift_list = [Shift("1", ShiftState.CLOSED, [receipt])]
+    shift_list = [Shift("1", ShiftState.CLOSED, [get_receipt()])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     try:
         service.remove_receipt("1", "1")
@@ -111,15 +106,7 @@ def test_remove_receipt_from_closed_shift_should_fail() -> None:
 
 
 def test_remove_receipt_from_shift() -> None:
-    receipt = Receipt(
-        "1",
-        "1",
-        ReceiptStatus.OPEN,
-        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
-        20,
-        10,
-    )
-    shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
+    shift_list = [Shift("1", ShiftState.OPEN, [get_receipt()])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     assert service.remove_receipt("1", "1")
 
@@ -135,15 +122,7 @@ def test_close_incorrect_shift_should_fail() -> None:
 
 
 def test_close_shift_with_open_receipt_should_fail() -> None:
-    receipt = Receipt(
-        "1",
-        "1",
-        ReceiptStatus.OPEN,
-        [ReceiptItem("1", "1", 2, 6, 12), ReceiptItem("1", "2", 2, 4, 8)],
-        20,
-        10,
-    )
-    shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
+    shift_list = [Shift("1", ShiftState.OPEN, [get_receipt()])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     try:
         service.close("1")
