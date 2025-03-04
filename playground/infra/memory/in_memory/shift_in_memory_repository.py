@@ -10,7 +10,7 @@ class ShiftInMemoryRepository:
     def __init__(self, shift_list: List[Shift] | None = None) -> None:
         if shift_list is None:
             shift_list = []
-        self.shift_list = deepcopy(shift_list)
+        self.shift_list = shift_list
 
     def get_open_shift_id(self) -> str | None:
         for shift in self.shift_list:

@@ -135,12 +135,13 @@ def test_close_shift() -> None:
     shift_list = [Shift("1", ShiftState.OPEN, [])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
     assert service.close("1")
+    assert shift_list[0].state == ShiftState.CLOSED
 
 
 def test_x_report() -> None:
     x_report = XReport("1", 1, [ProductReport("1", 2)], [Revenue("GEL", 10)])
     receipt = Receipt("1", "1", ReceiptStatus.CLOSED, [ReceiptItem("1", "1", 2, 5, 10)], 10, 10)
-    shift_list = [Shift("1", ShiftState.CLOSED, [receipt])]
+    shift_list = [Shift("1", ShiftState.OPEN, [receipt])]
     service = ShiftService(ShiftInMemoryRepository(shift_list))
 
     assert service.get_x_report("1", PaymentsServiceMock()) == x_report
@@ -153,3 +154,13 @@ def test_x_report_on_non_existing_shift() -> None:
         assert False
     except IndexError:
         assert True
+
+
+def test_should_return_z_report() -> None:
+    x_report = XReport("2", 1, [ProductReport("1", 2)], [Revenue("GEL", 10)])
+    receipt = Receipt("1", "1", ReceiptStatus.CLOSED, [ReceiptItem("1", "1", 2, 5, 10)], 10, 10)
+    shift_list = [Shift("2", ShiftState.OPEN, [receipt])]
+    service = ShiftService(ShiftInMemoryRepository(shift_list))
+
+    assert service.get_z_report("2", PaymentsServiceMock()) == x_report
+    assert shift_list[0].state == ShiftState.CLOSED
