@@ -296,3 +296,77 @@ def test_apply_combo() -> None:
     assert res.products[1].quantity == 2
 
     assert res.discounted_total == 90
+
+
+def test_apply_mixed_campaigns() -> None:
+    service = CampaignService(
+        CampaignInMemoryRepository(
+            [
+                Campaign(
+                    id="1",
+                    description=CampaignRequestWithType(
+                        type="combo",
+                        params={"product_ids": ["1", "2"], "discount_percentage": 10},
+                    ),
+                ),
+                Campaign(
+                    id="2",
+                    description=CampaignRequestWithType(
+                        type="buy_n_get_n",
+                        params={"product_id": "2", "required_quantity": 1},
+                    ),
+                ),
+                Campaign(
+                    id="3",
+                    description=CampaignRequestWithType(
+                        type="discount_receipt",
+                        params={
+                            "applicable_receipt": "1",
+                            "discount_percentage": 50,
+                            "required_price": 100,
+                        },
+                    ),
+                ),
+                Campaign(
+                    id="4",
+                    description=CampaignRequestWithType(
+                        type="discount_product",
+                        params={"applicable_product": "1", "discount_percentage": 10},
+                    ),
+                ),
+            ]
+        )
+    )
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="1",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    product_id="2",
+                    quantity=2,
+                    price=10,
+                    total=20,
+                ),
+                ReceiptItem(
+                    product_id="3",
+                    quantity=3,
+                    price=10,
+                    total=30,
+                ),
+            ],
+            total=150,
+            discounted_total=None,
+        )
+    )
+    assert res is not None
+    assert res.id == "1"
+    assert res.products[1].quantity == 3
+    assert res.discounted_total == 75

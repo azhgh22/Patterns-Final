@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -35,11 +36,12 @@ class BuyNGetNCampaign(CampaignInterface):
         self.product_id = product_id
 
     def apply(self, receipt: Receipt) -> Receipt:
-        for item in receipt.products:
+        modded = copy.deepcopy(receipt)
+        for item in modded.products:
             if item.product_id == self.product_id and item.quantity >= self.required_quantity:
-                item.quantity += item.quantity
-        receipt.discounted_total = receipt.total
-        return receipt
+                item.quantity += self.required_quantity
+        modded.discounted_total = modded.total
+        return modded
 
     def to_request(self) -> CampaignRequestWithType:
         return CampaignRequestWithType(
@@ -68,17 +70,18 @@ class DiscountProductCampaign(CampaignInterface):
         self.discount_percentage = discount_percentage
 
     def apply(self, receipt: Receipt) -> Receipt:
+        modded = copy.deepcopy(receipt)
         new_total = 0
-        receipt.discounted_total = receipt.total
+        modded.discounted_total = modded.total
         applied = False
-        for item in receipt.products:
+        for item in modded.products:
             if item.product_id == self.applicable_product:
                 item.total = round(item.total * (1 - self.discount_percentage / 100))
                 applied = True
             new_total += item.total
         if applied:
-            receipt.discounted_total = new_total
-        return receipt
+            modded.discounted_total = new_total
+        return modded
 
     def to_request(self) -> CampaignRequestWithType:
         return CampaignRequestWithType(
@@ -109,12 +112,12 @@ class DiscountReceiptCampaign(CampaignInterface):
         self.required_price = required_price
 
     def apply(self, receipt: Receipt) -> Receipt:
-        receipt.discounted_total = receipt.total
-        if receipt.total >= self.required_price:
-            receipt.discounted_total = round(
-                receipt.total * (1 - self.discount_percentage / 100)
-            )
-        return receipt
+        modded = copy.deepcopy(receipt)
+
+        modded.discounted_total = modded.total
+        if modded.total >= self.required_price:
+            modded.discounted_total = round(modded.total * (1 - self.discount_percentage / 100))
+        return modded
 
     def to_request(self) -> CampaignRequestWithType:
         return CampaignRequestWithType(
@@ -148,17 +151,18 @@ class ComboCampaign(CampaignInterface):
         self.discount_percentage = discount_percentage
 
     def apply(self, receipt: Receipt) -> Receipt:
-        receipt.discounted_total = receipt.total
+        modded = copy.deepcopy(receipt)
+        modded.discounted_total = modded.total
         if all(
-            any(item.product_id == pid for item in receipt.products) for pid in self.product_ids
+            any(item.product_id == pid for item in modded.products) for pid in self.product_ids
         ):
             new_total = 0
-            for item in receipt.products:
+            for item in modded.products:
                 if item.product_id in self.product_ids:
                     item.total = round(item.total * (1 - self.discount_percentage / 100))
                 new_total += item.total
-            receipt.discounted_total = new_total
-        return receipt
+            modded.discounted_total = new_total
+        return modded
 
     @classmethod
     def create(cls, **kwargs: typing.Any) -> CampaignInterface:

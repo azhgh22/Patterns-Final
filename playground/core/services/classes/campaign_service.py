@@ -2,10 +2,14 @@ import typing
 from dataclasses import dataclass
 from typing import List
 from uuid import uuid4
+import copy
 
 from playground.core.models.campaign import Campaign
 from playground.core.models.receipt import Receipt
-from playground.core.services.classes.campaign_classes import CampaignRequestWithType
+from playground.core.services.classes.campaign_classes import (
+    CampaignRequestWithType,
+    BuyNGetNCampaign,
+)
 from playground.core.services.classes.campaign_factory import (
     CampaignFactory,
 )
@@ -29,10 +33,20 @@ class CampaignService:
 
     def apply(self, receipt: Receipt) -> Receipt:
         campaigns = self.get_all()
-        res = receipt
+
+        res = copy.deepcopy(receipt)
+        discounted = copy.deepcopy(receipt)
+        discounted.discounted_total = discounted.total
         for campaign in campaigns:
-            res = campaign.get_campaign().apply(res)
-        return res
+            if campaign.description.type != "buy_n_get_n":
+                tmp = campaign.get_campaign().apply(res)
+
+                if tmp.discounted_total < discounted.discounted_total:
+                    discounted = tmp
+            else:
+                discounted = campaign.get_campaign().apply(discounted)
+                res = campaign.get_campaign().apply(res)
+        return discounted
 
     def get_by_id(self, campaign_id: str) -> Campaign:
         return self.repo.get_by_id(campaign_id)
@@ -43,9 +57,7 @@ class CampaignService:
     def get_campaign_request_with_type_instance(
         self, campaign_type: str, **kwargs: typing.Any
     ) -> CampaignRequestWithType:
-        return self.factory.create_campaign(
-            campaign_type=campaign_type, **kwargs
-        ).to_request()
+        return self.factory.create_campaign(campaign_type=campaign_type, **kwargs).to_request()
 
     def delete(self, campaign_id: str) -> None:
         self.repo.delete_campaign(campaign_id)
