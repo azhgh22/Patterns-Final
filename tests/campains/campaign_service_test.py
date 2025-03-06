@@ -176,7 +176,7 @@ def test_apply_discount_receipt() -> None:
     res = service.apply(
         Receipt(
             id="1",
-            shift_id="1",
+            shift_id="5",
             status=ReceiptStatus.OPEN,
             products=[
                 ReceiptItem(
@@ -218,7 +218,7 @@ def test_apply_buy_n_get_n() -> None:
     res = service.apply(
         Receipt(
             id="1",
-            shift_id="1",
+            shift_id="4",
             status=ReceiptStatus.OPEN,
             products=[
                 ReceiptItem(
@@ -340,7 +340,7 @@ def test_apply_mixed_campaigns() -> None:
     res = service.apply(
         Receipt(
             id="1",
-            shift_id="1",
+            shift_id="2",
             status=ReceiptStatus.OPEN,
             products=[
                 ReceiptItem(
