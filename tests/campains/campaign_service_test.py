@@ -8,32 +8,6 @@ from playground.infra.memory.in_memory.campaign_in_memory_repository import (
 )
 
 
-def get_receipt() -> Receipt:
-    return Receipt(
-        id="1",
-        shift_id="1",
-        status=ReceiptStatus.OPEN,
-        products=[
-            ReceiptItem(
-                receipt_id="1",
-                product_id="1",
-                quantity=1,
-                price=100,
-                total=100,
-            ),
-            ReceiptItem(
-                receipt_id="1",
-                product_id="2",
-                quantity=1,
-                price=100,
-                total=100,
-            ),
-        ],
-        total=200,
-        discounted_total=None,
-    )
-
-
 def test_env_works() -> None:
     pass
 
@@ -151,7 +125,31 @@ def test_apply_discount_product() -> None:
             ]
         )
     )
-    res = service.apply(get_receipt())
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="1",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    receipt_id="1",
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    receipt_id="1",
+                    product_id="2",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+            ],
+            total=200,
+            discounted_total=None,
+        )
+    )
     assert res is not None
     assert res.id == "1"
     assert res.discounted_total == 150
@@ -177,7 +175,31 @@ def test_apply_discount_receipt() -> None:
             ]
         )
     )
-    res = service.apply(get_receipt())
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="5",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    receipt_id="1",
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    receipt_id="1",
+                    product_id="2",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+            ],
+            total=200,
+            discounted_total=None,
+        )
+    )
     assert res is not None
     assert res.id == "1"
     assert res.discounted_total == 100
@@ -197,7 +219,31 @@ def test_apply_buy_n_get_n() -> None:
             ]
         )
     )
-    res = service.apply(get_receipt())
+    res = service.apply(
+        Receipt(
+            id="1",
+            shift_id="4",
+            status=ReceiptStatus.OPEN,
+            products=[
+                ReceiptItem(
+                    receipt_id="1",
+                    product_id="1",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+                ReceiptItem(
+                    receipt_id="1",
+                    product_id="2",
+                    quantity=1,
+                    price=100,
+                    total=100,
+                ),
+            ],
+            total=200,
+            discounted_total=None,
+        )
+    )
     assert res is not None
     assert res.id == "1"
     assert res.discounted_total == 200
