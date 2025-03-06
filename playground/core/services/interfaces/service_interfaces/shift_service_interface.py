@@ -30,3 +30,6 @@ class IShiftService(Protocol):
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
         pass
+
+    def get_z_report(self, shift_id: str, payment_service: IPaymentsService) -> XReport:
+        pass

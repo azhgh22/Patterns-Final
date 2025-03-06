@@ -23,12 +23,12 @@ def get_campaign_service(request: Request) -> ICampaignService:
     return service_chooser.get_campaign_service(repository_chooser.get_campaign_repo())
 
 
-@campaigns_api.get("")
+@campaigns_api.get("/")
 async def get_campaigns(request: Request) -> List[Campaign]:
     return get_campaign_service(request).get_all()
 
 
-@campaigns_api.post("")
+@campaigns_api.post("/")
 async def create_campaign(
     request: Request, campaign_type: str, params: Dict[str, Any]
 ) -> Campaign:

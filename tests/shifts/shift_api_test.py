@@ -38,13 +38,27 @@ def test_close_non_existent_shift() -> None:
 
 
 def test_get_x_report_for_existing_shift() -> None:
-    shift_repo = ShiftInMemoryRepository([Shift("1", ShiftState.OPEN, [])])
+    shift = Shift("1", ShiftState.OPEN, [])
+    shift_repo = ShiftInMemoryRepository([shift])
     response = get_http(shift_repo).get("/shifts/x-report/1")
     assert response.status_code == HTTP_200_OK
     assert isinstance(XReport(**response.json()), XReport)
     x_report = XReport(**response.json())
     assert x_report.shift_id == "1"
     assert x_report.num_receipts == 0
+    assert shift.state == ShiftState.OPEN
+
+
+def test_get_z_report_for_existing_shift() -> None:
+    shift = Shift("2", ShiftState.OPEN, [])
+    shift_repo = ShiftInMemoryRepository([shift])
+    response = get_http(shift_repo).get("/shifts/z-report/2")
+    assert response.status_code == HTTP_200_OK
+    assert isinstance(XReport(**response.json()), XReport)
+    x_report = XReport(**response.json())
+    assert x_report.shift_id == "2"
+    assert x_report.num_receipts == 0
+    assert shift.state == ShiftState.CLOSED
 
 
 def test_get_x_report_for_non_existent_shift() -> None:

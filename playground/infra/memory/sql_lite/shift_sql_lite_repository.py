@@ -12,20 +12,21 @@ class ShiftSqlLiteRepository:
         self.receipt_repo = receipt_repo
         self.__create_shift_table()
 
-    def get_open_shift_id(self) -> str | None:
+    def __get_shift_id_with_key_value(self, key: str, value: str) -> list[str]:
         res = self.conn.execute(f"""
-            select id from shifts 
-            where status = '{str(ShiftState.OPEN)}';
-        """).fetchone()
+                    select id from shifts 
+                    where {key}='{value}';
+                """).fetchall()
+        return list(x[0] for x in res)
 
-        if res is not None:
-            return str(res[0])
-        return None
+    def get_open_shift_id(self) -> str | None:
+        res = self.__get_shift_id_with_key_value("status", ShiftState.OPEN)
+        return None if len(res) == 0 else res[0]
 
     def close(self, shift_id: str) -> bool:
         updated_rows = self.conn.execute(f"""
                             update shifts
-                            set status = '{str(ShiftState.CLOSED)}'
+                            set status = '{ShiftState.CLOSED}'
                             where id = '{shift_id}'
                         """).rowcount
         self.conn.commit()
@@ -37,7 +38,7 @@ class ShiftSqlLiteRepository:
             insert into shifts (id,status)
             values(?,?)
         """,
-            (shift.id, str(shift.state)),
+            (shift.id, shift.state),
         )
         self.conn.commit()
 
@@ -49,15 +50,11 @@ class ShiftSqlLiteRepository:
         return self.receipt_repo.get_all_receipts(shift_id)
 
     def remove_receipt(self, shift_id: str, receipt_id: str) -> bool:
-        return self.receipt_repo.clear_receipt_shift_id(receipt_id)
+        return self.receipt_repo.update_shift_id("", receipt_id)
 
     def shift_exists(self, shift_id: str) -> bool:
-        res = self.conn.execute(f"""
-            select * from shifts
-            where id = '{shift_id}'
-        """).fetchone()
-
-        return res is not None
+        res = self.__get_shift_id_with_key_value("id", shift_id)
+        return len(res) > 0
 
     def __create_shift_table(self) -> None:
         self.conn.execute("""

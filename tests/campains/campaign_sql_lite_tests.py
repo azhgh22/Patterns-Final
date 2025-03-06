@@ -34,15 +34,11 @@ def sample_campaign() -> Campaign:
     return Campaign(id="1", description=description)
 
 
-def test_add_campaign(
-    repository: CampaignSQLRepository, sample_campaign: Campaign
-) -> None:
+def test_add_campaign(repository: CampaignSQLRepository, sample_campaign: Campaign) -> None:
     repository.add_campaign(sample_campaign)
 
     # Verify campaign was added
-    repository.cursor.execute(
-        "SELECT * FROM campaigns WHERE id = ?", (sample_campaign.id,)
-    )
+    repository.cursor.execute("SELECT * FROM campaigns WHERE id = ?", (sample_campaign.id,))
     row = repository.cursor.fetchone()
     assert row is not None
     assert row[0] == sample_campaign.id
@@ -61,9 +57,7 @@ def test_add_campaign_two_times(
         repository.add_campaign(sample_campaign)
 
 
-def test_get_by_id(
-    repository: CampaignSQLRepository, sample_campaign: Campaign
-) -> None:
+def insert_campaigns(repository: CampaignSQLRepository, sample_campaign: Campaign) -> None:
     repository.cursor.execute(
         "INSERT INTO campaigns (id, description) VALUES (?, ?)",
         (
@@ -76,6 +70,10 @@ def test_get_by_id(
             ),
         ),
     )
+
+
+def test_get_by_id(repository: CampaignSQLRepository, sample_campaign: Campaign) -> None:
+    insert_campaigns(repository, sample_campaign)
     retrieved = repository.get_by_id("1")
     assert retrieved.id == sample_campaign.id
     assert retrieved.description.type == sample_campaign.description.type
@@ -88,38 +86,14 @@ def test_get_by_id_not_found(repository: CampaignSQLRepository) -> None:
 
 
 def test_get_all(repository: CampaignSQLRepository, sample_campaign: Campaign) -> None:
-    repository.cursor.execute(
-        "INSERT INTO campaigns (id, description) VALUES (?, ?)",
-        (
-            sample_campaign.id,
-            json.dumps(
-                {
-                    "type": sample_campaign.description.type,
-                    "params": sample_campaign.description.params,
-                }
-            ),
-        ),
-    )
+    insert_campaigns(repository, sample_campaign)
     campaigns = repository.get_all()
     assert len(campaigns) == 1
     assert campaigns[0].id == sample_campaign.id
 
 
-def test_delete_campaign(
-    repository: CampaignSQLRepository, sample_campaign: Campaign
-) -> None:
-    repository.cursor.execute(
-        "INSERT INTO campaigns (id, description) VALUES (?, ?)",
-        (
-            sample_campaign.id,
-            json.dumps(
-                {
-                    "type": sample_campaign.description.type,
-                    "params": sample_campaign.description.params,
-                }
-            ),
-        ),
-    )
+def test_delete_campaign(repository: CampaignSQLRepository, sample_campaign: Campaign) -> None:
+    insert_campaigns(repository, sample_campaign)
     repository.delete_campaign("1")
 
     # Verify campaign was deleted

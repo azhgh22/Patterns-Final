@@ -10,7 +10,14 @@ from playground.core.models.receipt import Receipt, ReceiptItem
 from playground.infra.memory.sql_lite.receipt_sql_lite_repository import ReceiptSqlLiteRepository
 
 
-def insert_receipt(conn: Connection, receipt: Receipt) -> None:
+def insert_receipt(
+    conn: Connection,
+    receipt: Receipt = Receipt("1", "1", ReceiptStatus.OPEN, [], 100, None),
+    items: list[ReceiptItem] | None = None,
+) -> None:
+    if items is None:
+        items = []
+
     conn.execute(
         """
         INSERT INTO receipts (id, shift_id, status, total, discounted_total)
@@ -24,7 +31,7 @@ def insert_receipt(conn: Connection, receipt: Receipt) -> None:
             receipt.discounted_total,
         ),
     )
-    for item in receipt.products:
+    for item in items:
         conn.execute(
             """
             INSERT INTO receipt_items (receipt_id, product_id, quantity, price, total)
@@ -58,7 +65,7 @@ def get_receipt_direct(conn: Connection, receipt_id: str) -> Receipt | None:
     )
     items = conn.execute(
         """
-        SELECT product_id, quantity, price, total
+        SELECT receipt_id ,product_id, quantity, price, total
         FROM receipt_items
         WHERE receipt_id = ?
         """,
@@ -66,9 +73,7 @@ def get_receipt_direct(conn: Connection, receipt_id: str) -> Receipt | None:
     ).fetchall()
 
     for item in items:
-        receipt.products.append(
-            ReceiptItem(product_id=item[0], quantity=item[1], price=item[2], total=item[3])
-        )
+        receipt.products.append(ReceiptItem(item[0], item[1], item[2], item[3], item[4]))
     return receipt
 
 
@@ -94,7 +99,7 @@ def test_should_store_new_receipt(conn: Connection) -> None:
         shift_id="s1",
         status=ReceiptStatus.OPEN,
         products=[],
-        total=0,
+        total=100,
         discounted_total=None,
     )
     repo.store_receipt(receipt)
@@ -110,36 +115,18 @@ def test_should_store_new_receipt(conn: Connection) -> None:
 
 def test_should_check_contains_receipt(conn: Connection) -> None:
     repo = ReceiptSqlLiteRepository(conn)
-    assert not repo.contains_receipt("r1")
-    receipt = Receipt(
-        id="r1",
-        shift_id="s1",
-        status=ReceiptStatus.OPEN,
-        products=[],
-        total=0,
-        discounted_total=None,
-    )
-    insert_receipt(conn, receipt)
-    assert repo.contains_receipt("r1")
+    assert not repo.contains_receipt("1")
+    insert_receipt(conn)
+    assert repo.contains_receipt("1")
     conn.close()
 
 
 def test_should_delete_receipt(conn: Connection) -> None:
     repo = ReceiptSqlLiteRepository(conn)
-    receipt = Receipt(
-        id="r1",
-        shift_id="s1",
-        status=ReceiptStatus.OPEN,
-        products=[],
-        total=0,
-        discounted_total=None,
-    )
-    insert_receipt(conn, receipt)
-    # Ensure it exists.
-    assert get_receipt_direct(conn, "r1") is not None
-    # Delete it and verify.
-    assert repo.delete_receipt("r1")
-    assert get_receipt_direct(conn, "r1") is None
+    insert_receipt(conn)
+    assert get_receipt_direct(conn, "1") is not None
+    assert repo.delete_receipt("1")
+    assert get_receipt_direct(conn, "1") is None
     conn.close()
 
 
@@ -151,59 +138,92 @@ def test_should_return_none_for_non_existing_receipt(conn: Connection) -> None:
 
 def test_should_add_product_to_receipt(conn: Connection) -> None:
     repo = ReceiptSqlLiteRepository(conn)
-    # Create a receipt with no products.
-    receipt = Receipt(
-        id="r1",
-        shift_id="s1",
-        status=ReceiptStatus.OPEN,
-        products=[],
-        total=0,
-        discounted_total=None,
-    )
-    repo.store_receipt(receipt)
-
-    # Create a product to add.
+    insert_receipt(conn)
     product = Product("p1", "Test Product", "barcode1", 100)
-
-    # Add product with quantity 2.
-    updated = repo.add_product_to_receipt(receipt, product, 2)
+    updated = repo.add_product_to_receipt(
+        ReceiptItem("1", product.id, 2, product.price, 2 * product.price)
+    )
+    assert updated is not None
     assert len(updated.products) == 1
     item = updated.products[0]
     assert item.product_id == "p1"
     assert item.quantity == 2
     assert item.price == 100
     assert item.total == 200
-    assert updated.total == 200
-
-    # Add the same product with an additional quantity of 3.
-    updated = repo.add_product_to_receipt(receipt, product, 3)
-    assert len(updated.products) == 1
-    item = updated.products[0]
-    assert item.quantity == 5
-    assert item.total == 500
-    assert updated.total == 500
+    assert updated.total == 100
     conn.close()
 
 
-def test_should_close_receipt(conn: Connection) -> None:
+def test_should_return_receipt_item(conn: Connection) -> None:
     repo = ReceiptSqlLiteRepository(conn)
-    receipt = Receipt(
-        id="r1",
-        shift_id="s1",
-        status=ReceiptStatus.OPEN,
-        products=[],
-        total=100,
-        discounted_total=None,
-    )
-    insert_receipt(conn, receipt)
-    # Update receipt details.
-    receipt.total = 150
-    receipt.discounted_total = 140
-    receipt.status = ReceiptStatus.CLOSED
-    repo.close_receipt(receipt)
-    updated = get_receipt_direct(conn, "r1")
-    assert updated is not None
-    assert updated.total == 150
-    assert updated.discounted_total == 140
-    assert updated.status == ReceiptStatus.CLOSED
+    # Create a receipt with no products.
+    insert_receipt(conn, items=[ReceiptItem("1", "1", 1, 1, 1)])
+    item = repo.get_item("1", "1")
+    assert item is not None
+    assert item == ReceiptItem("1", "1", 1, 1, 1)
     conn.close()
+
+
+def test_should_remove_item(conn: Connection) -> None:
+    repo = ReceiptSqlLiteRepository(conn)
+    insert_receipt(conn, items=[ReceiptItem("1", "1", 1, 1, 1)])
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert len(receipt.products) == 1
+    repo.remove_item(ReceiptItem("1", "1", 1, 1, 1))
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert len(receipt.products) == 0
+    conn.close()
+
+
+def test_should_update_receipt_total(conn: Connection) -> None:
+    repo = ReceiptSqlLiteRepository(conn)
+    insert_receipt(conn)
+    repo.update_receipt_price("1", 10)
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert 10 == receipt.total
+    conn.close()
+
+
+def test_should_update_shift_id(conn: Connection) -> None:
+    repo = ReceiptSqlLiteRepository(conn)
+    insert_receipt(conn)
+    assert repo.update_shift_id("33", "1")
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert receipt.shift_id == "33"
+    conn.close()
+
+
+def test_should_return_all_receipts(conn: Connection) -> None:
+    repo = ReceiptSqlLiteRepository(conn)
+    insert_receipt(conn)
+    receipts = repo.get_all_receipts("1")
+    assert len(receipts) == 1
+    assert receipts[0].id == "1"
+    conn.close()
+
+
+def test_should_close_receipts(conn: Connection) -> None:
+    repo = ReceiptSqlLiteRepository(conn)
+    insert_receipt(conn, items=[ReceiptItem("1", "1", 1, 10, 10)])
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert receipt.status == ReceiptStatus.OPEN
+    assert receipt.discounted_total is None
+    assert len(receipt.products) == 1
+    assert receipt.products[0].quantity == 1
+    receipt.discounted_total = 100
+    receipt.products[0].quantity = 10
+    receipt.products[0].total = 100
+    receipt.status = ReceiptStatus.CLOSED
+    repo.close(receipt)
+    receipt = get_receipt_direct(conn, "1")
+    assert receipt is not None
+    assert receipt.status == ReceiptStatus.CLOSED
+    assert receipt.discounted_total == 100
+    assert len(receipt.products) == 1
+    assert receipt.products[0].quantity == 10
+    assert receipt.products[0].total == 100

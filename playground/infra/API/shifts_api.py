@@ -68,3 +68,14 @@ def get_x_report(request: Request, shift_id: str) -> XReport:
             status_code=HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
+
+
+@shifts_api.get("/z-report/{shift_id}", status_code=200)
+def get_z_report(request: Request, shift_id: str) -> XReport:
+    try:
+        return get_shifts_service(request).get_z_report(shift_id, get_payment_service(request))
+    except IndexError as e:
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )

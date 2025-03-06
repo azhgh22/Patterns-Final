@@ -1,6 +1,3 @@
-from enum import Enum
-
-
-class ShiftState(str, Enum):
+class ShiftState:
     OPEN = "open"
     CLOSED = "closed"

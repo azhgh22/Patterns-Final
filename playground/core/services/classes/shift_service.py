@@ -42,11 +42,7 @@ class ShiftService:
     def get_open_shift_id(self) -> str | None:
         return self.repo.get_open_shift_id()
 
-    def get_x_report(
-        self,
-        shift_id: str,
-        payment_service: IPaymentsService,
-    ) -> XReport:
+    def get_x_report(self, shift_id: str, payment_service: IPaymentsService) -> XReport:
         if not self.repo.shift_exists(shift_id):
             raise IndexError("shift doesn't exist")
         items: dict[str, int] = defaultdict(int)
@@ -87,3 +83,8 @@ class ShiftService:
 
         self.repo.remove_receipt(shift_id, receipt_id)
         return True
+
+    def get_z_report(self, shift_id: str, payment_service: IPaymentsService) -> XReport:
+        report = self.get_x_report(shift_id, payment_service)
+        self.close(shift_id)
+        return report

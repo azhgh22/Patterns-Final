@@ -1,4 +1,3 @@
-
 from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.enums.shift_state import ShiftState
 from playground.core.models.product import Product
@@ -108,10 +107,12 @@ def test_should_add_product_to_receipt() -> None:
     receipt = Receipt("11", "", ReceiptStatus.OPEN, [], 0, None)
     receipt_service = ReceiptService(ReceiptInMemoryRepository([receipt]))
     response = receipt_service.add_product("11", product_request, product_service)
+    assert response is not None
     assert isinstance(response, Receipt)
     assert response.id == "11"
     assert len(response.products) == 1
     assert len(receipt.products) == 1
+    assert response.total == 2
 
 
 def test_should_not_add_product_to_not_opened_receipt() -> None:

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import List
 
 from playground.core.enums.receipt_status import ReceiptStatus
 from playground.core.models.product import Product
@@ -7,6 +6,7 @@ from playground.core.models.product import Product
 
 @dataclass
 class ReceiptItem:
+    receipt_id: str
     product_id: str
     quantity: int
     price: int
@@ -16,13 +16,16 @@ class ReceiptItem:
         self.quantity += num_items
         self.total += self.price * num_items
 
+    def __hash__(self) -> int:
+        return hash((self.receipt_id, self.product_id, self.quantity, self.price, self.total))
+
 
 @dataclass
 class Receipt:
     id: str
     shift_id: str
     status: ReceiptStatus
-    products: List[ReceiptItem]
+    products: list[ReceiptItem]
     total: int
     discounted_total: int | None
 
