@@ -1,14 +1,13 @@
+import copy
 import typing
 from dataclasses import dataclass
 from typing import List
 from uuid import uuid4
-import copy
 
 from playground.core.models.campaign import Campaign
 from playground.core.models.receipt import Receipt
 from playground.core.services.classes.campaign_classes import (
     CampaignRequestWithType,
-    BuyNGetNCampaign,
 )
 from playground.core.services.classes.campaign_factory import (
     CampaignFactory,
@@ -41,7 +40,10 @@ class CampaignService:
             if campaign.description.type != "buy_n_get_n":
                 tmp = campaign.get_campaign().apply(res)
 
-                if tmp.discounted_total < discounted.discounted_total:
+                if (
+                    tmp.discounted_total is not None
+                    and tmp.discounted_total < discounted.discounted_total
+                ):
                     discounted = tmp
             else:
                 discounted = campaign.get_campaign().apply(discounted)
